@@ -2,15 +2,9 @@ import { z } from 'zod';
 import { validateCPF } from '@/lib/cpf.utils';
 
 export const registerPersonSchema = z.object({
-  // Seção A: Mídia
-  facePhoto: z.instanceof(File).nullable().refine(
-    (file) => file !== null,
-    'Foto de rosto é obrigatória'
-  ),
-  fullBodyPhoto: z.instanceof(File).nullable().refine(
-    (file) => file !== null,
-    'Foto de corpo inteiro é obrigatória'
-  ),
+  // Seção A: Mídia (opcionais)
+  facePhoto: z.instanceof(File).nullable().optional(),
+  fullBodyPhoto: z.instanceof(File).nullable().optional(),
   tattoos: z.array(z.object({
     photo: z.instanceof(File),
     location: z.string().min(1, 'Local é obrigatório'),
@@ -32,7 +26,7 @@ export const registerPersonSchema = z.object({
   fatherName: z.string().max(255).optional().or(z.literal('')),
 
   // Seção C: Localização e Legal
-  addressPrimary: z.string().min(1, 'Endereço é obrigatório'),
+  addressPrimary: z.string().optional().or(z.literal('')),
   addressSecondary: z.string().optional().or(z.literal('')),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),

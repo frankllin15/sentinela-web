@@ -50,12 +50,18 @@ export function RegisterPage() {
     try {
       setIsSaving(true);
 
-      // 1. Upload de todas as mídias em paralelo
-      const uploadPromises = [
-        uploadService.upload(data.facePhoto!),
-        uploadService.upload(data.fullBodyPhoto!),
-        ...data.tattoos.map(t => uploadService.upload(t.photo)),
-      ];
+      // 1. Upload de todas as mídias em paralelo (apenas as que existem)
+      const uploadPromises: Promise<string>[] = [];
+
+      if (data.facePhoto) {
+        uploadPromises.push(uploadService.upload(data.facePhoto));
+      }
+
+      if (data.fullBodyPhoto) {
+        uploadPromises.push(uploadService.upload(data.fullBodyPhoto));
+      }
+
+      uploadPromises.push(...data.tattoos.map(t => uploadService.upload(t.photo)));
 
       if (data.warrantFile) {
         uploadPromises.push(uploadService.upload(data.warrantFile));
@@ -63,10 +69,13 @@ export function RegisterPage() {
 
       const uploadedUrls = await Promise.all(uploadPromises);
 
-      const faceUrl = uploadedUrls[0];
-      const bodyUrl = uploadedUrls[1];
-      const tattooUrls = uploadedUrls.slice(2, 2 + data.tattoos.length);
-      const warrantUrl = data.warrantFile ? uploadedUrls[uploadedUrls.length - 1] : undefined;
+      // Extrair URLs de forma dinâmica
+      let urlIndex = 0;
+      const faceUrl = data.facePhoto ? uploadedUrls[urlIndex++] : undefined;
+      const bodyUrl = data.fullBodyPhoto ? uploadedUrls[urlIndex++] : undefined;
+      const tattooUrls = uploadedUrls.slice(urlIndex, urlIndex + data.tattoos.length);
+      urlIndex += data.tattoos.length;
+      const warrantUrl = data.warrantFile ? uploadedUrls[urlIndex] : undefined;
 
       // 2. Criar registro de pessoa
       const person = await peopleService.create({
@@ -75,7 +84,7 @@ export function RegisterPage() {
         cpf: data.cpf ? cleanCPF(data.cpf) : undefined,
         rg: data.rg || undefined,
         voterId: data.voterId || undefined,
-        addressPrimary: data.addressPrimary,
+        addressPrimary: data.addressPrimary || undefined,
         addressSecondary: data.addressSecondary || undefined,
         latitude: data.latitude,
         longitude: data.longitude,
@@ -87,18 +96,30 @@ export function RegisterPage() {
         isConfidential: data.isConfidential,
       });
 
-      // 3. Criar registros de mídia
-      const mediaPromises = [
-        mediaService.create({
-          type: MediaType.FACE,
-          url: faceUrl,
-          personId: person.id,
-        }),
-        mediaService.create({
-          type: MediaType.FULL_BODY,
-          url: bodyUrl,
-          personId: person.id,
-        }),
+      // 3. Criar registros de mídia (apenas as que existem)
+      const mediaPromises: Promise<unknown>[] = [];
+
+      if (faceUrl) {
+        mediaPromises.push(
+          mediaService.create({
+            type: MediaType.FACE,
+            url: faceUrl,
+            personId: person.id,
+          })
+        );
+      }
+
+      if (bodyUrl) {
+        mediaPromises.push(
+          mediaService.create({
+            type: MediaType.FULL_BODY,
+            url: bodyUrl,
+            personId: person.id,
+          })
+        );
+      }
+
+      mediaPromises.push(
         ...data.tattoos.map((tattoo, index) =>
           mediaService.create({
             type: MediaType.TATTOO,
@@ -107,8 +128,8 @@ export function RegisterPage() {
             description: tattoo.description || undefined,
             personId: person.id,
           })
-        ),
-      ];
+        )
+      );
 
       await Promise.all(mediaPromises);
 
@@ -156,9 +177,9 @@ export function RegisterPage() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8"
         >
-          <MediaSection control={form.control} />
-          <Separator />
           <PersonalDataSection control={form.control} />
+          <Separator />
+          <MediaSection control={form.control} />
           <Separator />
           <LocationLegalSection control={form.control} setValue={form.setValue} />
         </form>

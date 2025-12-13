@@ -51,7 +51,7 @@ export function LocationLegalSection({ control, setValue }: LocationLegalSection
           name="addressPrimary"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Endereço Principal *</FormLabel>
+              <FormLabel>Endereço Principal</FormLabel>
               <FormControl>
                 <Input
                   placeholder="Rua, número, bairro"

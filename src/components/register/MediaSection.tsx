@@ -63,7 +63,7 @@ export function MediaSection({ control }: MediaSectionProps) {
           name="facePhoto"
           render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
-              <FormLabel>Foto de Rosto *</FormLabel>
+              <FormLabel>Foto de Rosto</FormLabel>
               <FormControl>
                 <FileUploadButton
                   value={value}
@@ -82,7 +82,7 @@ export function MediaSection({ control }: MediaSectionProps) {
           name="fullBodyPhoto"
           render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
-              <FormLabel>Foto de Corpo Inteiro *</FormLabel>
+              <FormLabel>Foto de Corpo Inteiro</FormLabel>
               <FormControl>
                 <FileUploadButton
                   value={value}
