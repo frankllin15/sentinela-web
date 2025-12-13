@@ -17,17 +17,17 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold text-primary">SENTINELA</h1>
+      <header className="border-b border-border bg-card sticky top-0 z-40">
+        <div className="container mx-auto flex h-14 md:h-16 items-center justify-between px-4">
+          <div className="flex items-center gap-2 md:gap-4">
+            <h1 className="text-lg md:text-xl font-bold text-primary">SENTINELA</h1>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             {user && (
               <div className="flex items-center gap-2 text-sm">
                 <User className="h-4 w-4" />
-                <div className="flex flex-col">
+                <div className="hidden sm:flex flex-col">
                   <span className="font-medium">{user.email}</span>
                   <span className="text-xs text-muted-foreground">
                     {user.role.replace('_', ' ').toUpperCase()}
@@ -37,8 +37,8 @@ export function AppLayout() {
             )}
 
             <Button variant="outline" size="sm" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sair
+              <LogOut className="h-4 w-4" />
+              <span className="ml-2 hidden sm:inline">Sair</span>
             </Button>
           </div>
         </div>

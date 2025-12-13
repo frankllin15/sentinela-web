@@ -1,10 +1,13 @@
 import { useAuthStore } from '@/store/auth.store';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { UserCircle, Search, UserPlus } from 'lucide-react';
+import { ROUTES } from '@/constants/routes';
 
 export function HomePage() {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-6">
@@ -29,8 +32,11 @@ export function HomePage() {
             <p className="text-sm text-muted-foreground">
               Cadastrar novo indivíduo no sistema
             </p>
-            <Button className="mt-4 w-full" disabled>
-              Em breve
+            <Button
+              className="mt-4 w-full"
+              onClick={() => navigate(ROUTES.REGISTER)}
+            >
+              Começar Cadastro
             </Button>
           </CardContent>
         </Card>

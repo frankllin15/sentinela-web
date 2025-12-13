@@ -7,6 +7,7 @@ import { AuthLayout } from '@/layouts/AuthLayout';
 import { AppLayout } from '@/layouts/AppLayout';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { HomePage } from '@/pages/app/HomePage';
+import { RegisterPage } from '@/pages/app/RegisterPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { UserRole } from '@/types/auth.types';
 
@@ -39,6 +40,7 @@ function App() {
         }
       >
         <Route path="home" element={<HomePage />} />
+        <Route path="register" element={<RegisterPage />} />
       </Route>
 
       {/* Role-protected routes (Admin/Ponto Focal only) */}
