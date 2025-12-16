@@ -9,7 +9,10 @@ interface UseDuplicateCheckReturn {
   isChecking: boolean;
 }
 
-export function useDuplicateCheck(cpf: string): UseDuplicateCheckReturn {
+export function useDuplicateCheck(
+  cpf: string,
+  ignorePersonId?: number
+): UseDuplicateCheckReturn {
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [duplicateData, setDuplicateData] = useState<Person | null>(null);
   const [isChecking, setIsChecking] = useState(false);
@@ -27,7 +30,8 @@ export function useDuplicateCheck(cpf: string): UseDuplicateCheckReturn {
       setIsChecking(true);
       try {
         const person = await peopleService.checkByCpf(debouncedCpf);
-        if (person) {
+        if (person && person.id !== ignorePersonId) {
+          // Only treat as duplicate if it's a different person
           setIsDuplicate(true);
           setDuplicateData(person);
         } else {
@@ -43,7 +47,7 @@ export function useDuplicateCheck(cpf: string): UseDuplicateCheckReturn {
     };
 
     checkDuplicate();
-  }, [debouncedCpf]);
+  }, [debouncedCpf, ignorePersonId]);
 
   return { isDuplicate, duplicateData, isChecking };
 }

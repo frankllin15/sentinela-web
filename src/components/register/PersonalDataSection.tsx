@@ -15,12 +15,13 @@ import { Loader2 } from 'lucide-react';
 
 interface PersonalDataSectionProps {
   control: Control<RegisterPersonFormData>;
+  personId?: number;
 }
 
-export function PersonalDataSection({ control }: PersonalDataSectionProps) {
+export function PersonalDataSection({ control, personId }: PersonalDataSectionProps) {
   const cpf = useWatch({ control, name: 'cpf' });
   const cleanedCpf = cpf ? cleanCPF(cpf) : '';
-  const { isDuplicate, duplicateData, isChecking } = useDuplicateCheck(cleanedCpf);
+  const { isDuplicate, duplicateData, isChecking } = useDuplicateCheck(cleanedCpf, personId);
 
   return (
     <div className="space-y-6">

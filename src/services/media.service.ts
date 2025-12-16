@@ -10,4 +10,13 @@ export const mediaService = {
   async createMultiple(dataArray: CreateMediaDto[]): Promise<Media[]> {
     return Promise.all(dataArray.map((data) => this.create(data)));
   },
+
+  async getByPersonId(personId: number): Promise<Media[]> {
+    const response = await api.get<Media[]>(`/media/person/${personId}`);
+    return response.data;
+  },
+
+  async delete(id: number): Promise<void> {
+    await api.delete(`/media/${id}`);
+  },
 };

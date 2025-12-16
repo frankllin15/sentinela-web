@@ -13,12 +13,15 @@ import { FileUploadButton } from './FileUploadButton';
 import { TattooCard } from './TattooCard';
 import { TattooDialog } from './TattooDialog';
 import type { RegisterPersonFormData } from '@/schemas/person.schema';
+import type { Media } from '@/types/media.types';
 
 interface MediaSectionProps {
   control: Control<RegisterPersonFormData>;
+  existingFacePhoto?: Media;
+  existingBodyPhoto?: Media;
 }
 
-export function MediaSection({ control }: MediaSectionProps) {
+export function MediaSection({ control, existingFacePhoto, existingBodyPhoto }: MediaSectionProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
@@ -69,6 +72,7 @@ export function MediaSection({ control }: MediaSectionProps) {
                   value={value}
                   onChange={onChange}
                   label="Tirar Foto do Rosto"
+                  existingImageUrl={existingFacePhoto?.url}
                   {...field}
                 />
               </FormControl>
@@ -88,6 +92,7 @@ export function MediaSection({ control }: MediaSectionProps) {
                   value={value}
                   onChange={onChange}
                   label="Tirar Foto de Corpo Inteiro"
+                  existingImageUrl={existingBodyPhoto?.url}
                   {...field}
                 />
               </FormControl>
