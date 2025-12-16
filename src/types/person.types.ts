@@ -26,7 +26,7 @@ export interface CreatePersonDto {
   cpf?: string;
   rg?: string;
   voterId?: string;
-  addressPrimary: string;
+  addressPrimary?: string;
   addressSecondary?: string;
   latitude: number;
   longitude: number;

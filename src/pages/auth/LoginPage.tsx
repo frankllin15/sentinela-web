@@ -46,8 +46,6 @@ export function LoginPage() {
         const message =
           error.response?.data?.message || 'Email ou senha incorretos';
         toast.error(message);
-      } else {
-        toast.error('Erro ao fazer login. Tente novamente.');
       }
     }
   };
