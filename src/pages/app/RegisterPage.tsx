@@ -1,21 +1,25 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import { Form } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { MediaSection } from '@/components/register/MediaSection';
-import { PersonalDataSection } from '@/components/register/PersonalDataSection';
-import { LocationLegalSection } from '@/components/register/LocationLegalSection';
-import { registerPersonSchema, type RegisterPersonFormData } from '@/schemas/person.schema';
-import { peopleService } from '@/services/people.service';
-import { mediaService } from '@/services/media.service';
-import { uploadService } from '@/services/upload.service';
-import { cleanCPF } from '@/lib/cpf.utils';
-import { MediaType } from '@/types/media.types';
-import { Loader2 } from 'lucide-react';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { MediaSection } from "@/components/register/MediaSection";
+import { PersonalDataSection } from "@/components/register/PersonalDataSection";
+import { LocationLegalSection } from "@/components/register/LocationLegalSection";
+import {
+  registerPersonSchema,
+  type RegisterPersonFormData,
+} from "@/schemas/person.schema";
+import { peopleService } from "@/services/people.service";
+import { mediaService } from "@/services/media.service";
+import { uploadService } from "@/services/upload.service";
+import { cleanCPF } from "@/lib/cpf.utils";
+import { MediaType } from "@/types/media.types";
+import { Loader2 } from "lucide-react";
+import { UploadCategory } from "@/types/upload-category";
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -27,22 +31,22 @@ export function RegisterPage() {
       facePhoto: null,
       fullBodyPhoto: null,
       tattoos: [],
-      fullName: '',
-      nickname: '',
-      cpf: '',
-      rg: '',
-      voterId: '',
-      motherName: '',
-      fatherName: '',
-      addressPrimary: '',
-      addressSecondary: '',
+      fullName: "",
+      nickname: "",
+      cpf: "",
+      rg: "",
+      voterId: "",
+      motherName: "",
+      fatherName: "",
+      addressPrimary: "",
+      addressSecondary: "",
       latitude: 0,
       longitude: 0,
       hasWarrant: false,
-      warrantStatus: '',
+      warrantStatus: "",
       warrantFile: null,
       isConfidential: false,
-      notes: '',
+      notes: "",
     },
   });
 
@@ -53,18 +57,34 @@ export function RegisterPage() {
       // 1. Upload de todas as mídias em paralelo (apenas as que existem)
       const uploadPromises: Promise<string>[] = [];
 
+      // Foto de Rosto -> Pasta 'faces'
       if (data.facePhoto) {
-        uploadPromises.push(uploadService.upload(data.facePhoto));
+        uploadPromises.push(
+          uploadService.upload(data.facePhoto, UploadCategory.FACE)
+        );
       }
 
+      // Foto de Corpo -> Pasta 'bodies'
       if (data.fullBodyPhoto) {
-        uploadPromises.push(uploadService.upload(data.fullBodyPhoto));
+        uploadPromises.push(
+          uploadService.upload(data.fullBodyPhoto, UploadCategory.FULL_BODY)
+        );
       }
 
-      uploadPromises.push(...data.tattoos.map(t => uploadService.upload(t.photo)));
+      // Tatuagens -> Pasta 'tattoos'
+      if (data.tattoos.length > 0) {
+        // Mapeia todas as tattoos enviando a categoria correta
+        const tattooUploads = data.tattoos.map((t) =>
+          uploadService.upload(t.photo, UploadCategory.TATTOO)
+        );
+        uploadPromises.push(...tattooUploads);
+      }
 
+      // Mandado -> Pasta 'documents'
       if (data.warrantFile) {
-        uploadPromises.push(uploadService.upload(data.warrantFile));
+        uploadPromises.push(
+          uploadService.upload(data.warrantFile, UploadCategory.WARRANT)
+        );
       }
 
       const uploadedUrls = await Promise.all(uploadPromises);
@@ -73,7 +93,10 @@ export function RegisterPage() {
       let urlIndex = 0;
       const faceUrl = data.facePhoto ? uploadedUrls[urlIndex++] : undefined;
       const bodyUrl = data.fullBodyPhoto ? uploadedUrls[urlIndex++] : undefined;
-      const tattooUrls = uploadedUrls.slice(urlIndex, urlIndex + data.tattoos.length);
+      const tattooUrls = uploadedUrls.slice(
+        urlIndex,
+        urlIndex + data.tattoos.length
+      );
       urlIndex += data.tattoos.length;
       const warrantUrl = data.warrantFile ? uploadedUrls[urlIndex] : undefined;
 
@@ -134,11 +157,11 @@ export function RegisterPage() {
       await Promise.all(mediaPromises);
 
       // 4. Feedback e redirecionamento
-      toast.success('Cadastro realizado com sucesso!');
+      toast.success("Cadastro realizado com sucesso!");
       navigate(`/app/people/${person.id}`);
     } catch (error) {
       console.error(error);
-      toast.error('Erro ao salvar cadastro. Tente novamente.');
+      toast.error("Erro ao salvar cadastro. Tente novamente.");
     } finally {
       setIsSaving(false);
     }
@@ -154,18 +177,14 @@ export function RegisterPage() {
               Preencha todos os campos obrigatórios
             </p>
           </div>
-          <Button
-            type="submit"
-            form="register-form"
-            disabled={isSaving}
-          >
+          <Button type="submit" form="register-form" disabled={isSaving}>
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Salvando...
               </>
             ) : (
-              'Salvar Cadastro'
+              "Salvar Cadastro"
             )}
           </Button>
         </div>
@@ -181,7 +200,10 @@ export function RegisterPage() {
           <Separator />
           <MediaSection control={form.control} />
           <Separator />
-          <LocationLegalSection control={form.control} setValue={form.setValue} />
+          <LocationLegalSection
+            control={form.control}
+            setValue={form.setValue}
+          />
         </form>
       </Form>
     </div>

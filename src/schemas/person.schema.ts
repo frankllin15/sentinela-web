@@ -6,7 +6,7 @@ export const registerPersonSchema = z.object({
   facePhoto: z.instanceof(File).nullable().optional(),
   fullBodyPhoto: z.instanceof(File).nullable().optional(),
   tattoos: z.array(z.object({
-    photo: z.instanceof(File),
+    photo: z.union([z.instanceof(File), z.string()]),
     location: z.string().min(1, 'Local é obrigatório'),
     description: z.string().optional(),
   })),

@@ -3,7 +3,7 @@ import { Camera, X, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface FileUploadButtonProps {
-  value: File | null;
+  value?: File | null;
   onChange: (file: File | null) => void;
   label: string;
   accept?: string;

@@ -19,6 +19,7 @@ interface MediaSectionProps {
   control: Control<RegisterPersonFormData>;
   existingFacePhoto?: Media;
   existingBodyPhoto?: Media;
+  existingTattoos?: Media[];
 }
 
 export function MediaSection({ control, existingFacePhoto, existingBodyPhoto }: MediaSectionProps) {
@@ -28,6 +29,7 @@ export function MediaSection({ control, existingFacePhoto, existingBodyPhoto }: 
   const { fields, append, update, remove } = useFieldArray({
     control,
     name: 'tattoos',
+  
   });
 
   const handleSaveTattoo = (data: { photo: File; location: string; description?: string }) => {
@@ -48,6 +50,8 @@ export function MediaSection({ control, existingFacePhoto, existingBodyPhoto }: 
     setDialogOpen(false);
     setEditingIndex(null);
   };
+
+  console.log('Tattoo fields:', fields);
 
   return (
     <div className="space-y-6">

@@ -1,20 +1,24 @@
-import api from '@/lib/axios';
+import api from "@/lib/axios";
+import type { UploadCategory } from "@/types/upload-category";
 
 export const uploadService = {
-  async upload(file: File): Promise<string> {
+  // Agora aceita a categoria como segundo parâmetro
+  upload: async (file: File, category: UploadCategory): Promise<string> => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
+    formData.append("category", category); // Envia o campo extra
 
-    const response = await api.post<{ url: string }>('/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    try {
+      const response = await api.post<{ url: string }>("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    return response.data.url;
-  },
-
-  async uploadMultiple(files: File[]): Promise<string[]> {
-    return Promise.all(files.map((file) => this.upload(file)));
+      return response.data.url;
+    } catch (error) {
+      console.error("Erro no upload:", error);
+      throw error;
+    }
   },
 };

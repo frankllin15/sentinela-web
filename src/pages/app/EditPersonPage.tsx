@@ -1,22 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'sonner';
-import { ArrowLeft, Loader2 } from 'lucide-react';
-import { Form } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { MediaSection } from '@/components/register/MediaSection';
-import { PersonalDataSection } from '@/components/register/PersonalDataSection';
-import { LocationLegalSection } from '@/components/register/LocationLegalSection';
-import { registerPersonSchema, type RegisterPersonFormData } from '@/schemas/person.schema';
-import { peopleService } from '@/services/people.service';
-import { mediaService } from '@/services/media.service';
-import { uploadService } from '@/services/upload.service';
-import { cleanCPF } from '@/lib/cpf.utils';
-import { MediaType, type Media } from '@/types/media.types';
-import type { Person } from '@/types/person.types';
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { MediaSection } from "@/components/register/MediaSection";
+import { PersonalDataSection } from "@/components/register/PersonalDataSection";
+import { LocationLegalSection } from "@/components/register/LocationLegalSection";
+import {
+  registerPersonSchema,
+  type RegisterPersonFormData,
+} from "@/schemas/person.schema";
+import { peopleService } from "@/services/people.service";
+import { mediaService } from "@/services/media.service";
+import { uploadService } from "@/services/upload.service";
+import { cleanCPF } from "@/lib/cpf.utils";
+import { MediaType, type Media } from "@/types/media.types";
+import type { Person } from "@/types/person.types";
+import { UploadCategory } from "@/types/upload-category";
 
 export function EditPersonPage() {
   const { id } = useParams<{ id: string }>();
@@ -33,22 +37,22 @@ export function EditPersonPage() {
       facePhoto: null,
       fullBodyPhoto: null,
       tattoos: [],
-      fullName: '',
-      nickname: '',
-      cpf: '',
-      rg: '',
-      voterId: '',
-      motherName: '',
-      fatherName: '',
-      addressPrimary: '',
-      addressSecondary: '',
+      fullName: "",
+      nickname: "",
+      cpf: "",
+      rg: "",
+      voterId: "",
+      motherName: "",
+      fatherName: "",
+      addressPrimary: "",
+      addressSecondary: "",
       latitude: 0,
       longitude: 0,
       hasWarrant: false,
-      warrantStatus: '',
+      warrantStatus: "",
       warrantFile: null,
       isConfidential: false,
-      notes: '',
+      notes: "",
     },
   });
 
@@ -56,8 +60,8 @@ export function EditPersonPage() {
   useEffect(() => {
     const loadData = async () => {
       if (!id) {
-        toast.error('ID da pessoa não encontrado');
-        navigate('/app/home');
+        toast.error("ID da pessoa não encontrado");
+        navigate("/app/home");
         return;
       }
 
@@ -71,32 +75,41 @@ export function EditPersonPage() {
         setPerson(personData);
         setExistingMedias(mediaData);
 
+
+        const existingTattooMedias = mediaData.filter(
+          (m) => m.type === MediaType.TATTOO
+        );  
+
         // Pre-fill form with person data
         form.reset({
           facePhoto: null,
           fullBodyPhoto: null,
-          tattoos: [],
+          tattoos: existingTattooMedias.map((m) => ({
+           photo: m.url, // Placeholder File object
+            location: m.label || "",
+            description: m.description || "",
+          })),
           fullName: personData.fullName,
-          nickname: personData.nickname || '',
-          cpf: personData.cpf || '',
-          rg: personData.rg || '',
-          voterId: personData.voterId || '',
-          motherName: personData.motherName || '',
-          fatherName: personData.fatherName || '',
-          addressPrimary: personData.addressPrimary,
-          addressSecondary: personData.addressSecondary || '',
+          nickname: personData.nickname || "",
+          cpf: personData.cpf || "",
+          rg: personData.rg || "",
+          voterId: personData.voterId || "",
+          motherName: personData.motherName || "",
+          fatherName: personData.fatherName || "",
+          addressPrimary: personData.addressPrimary || "",
+          addressSecondary: personData.addressSecondary || "",
           latitude: personData.latitude,
           longitude: personData.longitude,
           hasWarrant: !!personData.warrantStatus,
-          warrantStatus: personData.warrantStatus || '',
+          warrantStatus: personData.warrantStatus || "",
           warrantFile: null,
           isConfidential: personData.isConfidential,
-          notes: personData.notes || '',
+          notes: personData.notes || "",
         });
       } catch (error) {
         console.error(error);
-        toast.error('Erro ao carregar dados da pessoa');
-        navigate('/app/home');
+        toast.error("Erro ao carregar dados da pessoa");
+        navigate("/app/home");
       } finally {
         setIsLoading(false);
       }
@@ -112,9 +125,15 @@ export function EditPersonPage() {
       setIsSaving(true);
 
       // Get existing media by type
-      const existingFaceMedia = existingMedias.find(m => m.type === MediaType.FACE);
-      const existingBodyMedia = existingMedias.find(m => m.type === MediaType.FULL_BODY);
-      const existingTattoos = existingMedias.filter(m => m.type === MediaType.TATTOO);
+      const existingFaceMedia = existingMedias.find(
+        (m) => m.type === MediaType.FACE
+      );
+      const existingBodyMedia = existingMedias.find(
+        (m) => m.type === MediaType.FULL_BODY
+      );
+      const existingTattoos = existingMedias.filter(
+        (m) => m.type === MediaType.TATTOO
+      );
 
       // 1. Upload new media files
       const uploadPromises: Promise<string>[] = [];
@@ -128,17 +147,29 @@ export function EditPersonPage() {
       const needWarrantUpload = !!data.warrantFile;
 
       if (needFaceUpload) {
-        uploadPromises.push(uploadService.upload(data.facePhoto!));
+        uploadPromises.push(
+          uploadService.upload(data.facePhoto!, UploadCategory.FACE)
+        );
       }
 
       if (needBodyUpload) {
-        uploadPromises.push(uploadService.upload(data.fullBodyPhoto!));
+        uploadPromises.push(
+          uploadService.upload(data.fullBodyPhoto!, UploadCategory.FULL_BODY)
+        );
       }
 
-      uploadPromises.push(...data.tattoos.map(t => uploadService.upload(t.photo)));
+      uploadPromises.push(
+        ...data.tattoos
+          .filter((t) => t.photo instanceof File)
+          .map((t) =>
+            uploadService.upload(t.photo as File, UploadCategory.TATTOO)
+          )
+      );
 
       if (needWarrantUpload) {
-        uploadPromises.push(uploadService.upload(data.warrantFile!));
+        uploadPromises.push(
+          uploadService.upload(data.warrantFile!, UploadCategory.WARRANT)
+        );
       }
 
       const uploadedUrls = await Promise.all(uploadPromises);
@@ -149,7 +180,7 @@ export function EditPersonPage() {
         faceUrl = uploadedUrls[urlIndex++];
         // Mark old face photo for deletion
         if (existingFaceMedia) {
-          setMediasToDelete(prev => [...prev, existingFaceMedia.id]);
+          setMediasToDelete((prev) => [...prev, existingFaceMedia.id]);
         }
       }
 
@@ -157,11 +188,14 @@ export function EditPersonPage() {
         bodyUrl = uploadedUrls[urlIndex++];
         // Mark old body photo for deletion
         if (existingBodyMedia) {
-          setMediasToDelete(prev => [...prev, existingBodyMedia.id]);
+          setMediasToDelete((prev) => [...prev, existingBodyMedia.id]);
         }
       }
 
-      const tattooUrls = uploadedUrls.slice(urlIndex, urlIndex + data.tattoos.length);
+      const tattooUrls = uploadedUrls.slice(
+        urlIndex,
+        urlIndex + data.tattoos.length
+      );
       urlIndex += data.tattoos.length;
 
       if (needWarrantUpload) {
@@ -213,7 +247,7 @@ export function EditPersonPage() {
       }
 
       // Delete old tattoos (we're replacing all tattoos with the new set)
-      existingTattoos.forEach(tattoo => {
+      existingTattoos.forEach((tattoo) => {
         mediaPromises.push(mediaService.delete(tattoo.id));
       });
 
@@ -231,18 +265,18 @@ export function EditPersonPage() {
       );
 
       // Delete marked media
-      mediasToDelete.forEach(mediaId => {
+      mediasToDelete.forEach((mediaId) => {
         mediaPromises.push(mediaService.delete(mediaId));
       });
 
       await Promise.all(mediaPromises);
 
       // 4. Feedback and navigation
-      toast.success('Cadastro atualizado com sucesso!');
+      toast.success("Cadastro atualizado com sucesso!");
       navigate(`/app/people/${person.id}`);
     } catch (error) {
       console.error(error);
-      toast.error('Erro ao atualizar cadastro. Tente novamente.');
+      toast.error("Erro ao atualizar cadastro. Tente novamente.");
     } finally {
       setIsSaving(false);
     }
@@ -260,8 +294,12 @@ export function EditPersonPage() {
     return null;
   }
 
-  const existingFaceMedia = existingMedias.find(m => m.type === MediaType.FACE);
-  const existingBodyMedia = existingMedias.find(m => m.type === MediaType.FULL_BODY);
+  const existingFaceMedia = existingMedias.find(
+    (m) => m.type === MediaType.FACE
+  );
+  const existingBodyMedia = existingMedias.find(
+    (m) => m.type === MediaType.FULL_BODY
+  );
 
   return (
     <div className="max-w-2xl mx-auto pb-8">
@@ -283,18 +321,14 @@ export function EditPersonPage() {
               </p>
             </div>
           </div>
-          <Button
-            type="submit"
-            form="edit-form"
-            disabled={isSaving}
-          >
+          <Button type="submit" form="edit-form" disabled={isSaving}>
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Salvando...
               </>
             ) : (
-              'Salvar Alterações'
+              "Salvar Alterações"
             )}
           </Button>
         </div>
@@ -306,10 +340,7 @@ export function EditPersonPage() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8"
         >
-          <PersonalDataSection
-            control={form.control}
-            personId={person.id}
-          />
+          <PersonalDataSection control={form.control} personId={person.id} />
           <Separator />
           <MediaSection
             control={form.control}
@@ -317,7 +348,10 @@ export function EditPersonPage() {
             existingBodyPhoto={existingBodyMedia}
           />
           <Separator />
-          <LocationLegalSection control={form.control} setValue={form.setValue} />
+          <LocationLegalSection
+            control={form.control}
+            setValue={form.setValue}
+          />
         </form>
       </Form>
     </div>
