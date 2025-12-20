@@ -16,8 +16,8 @@ import { FileUploadButton } from './FileUploadButton';
 interface TattooDialogProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: { photo: File; location: string; description?: string }) => void;
-  initialData?: { photo: File; location: string; description?: string };
+  onSave: (data: { photo: File | string; location: string; description?: string }) => void;
+  initialData?: { photo: File | string; location: string; description?: string };
 }
 
 export function TattooDialog({
@@ -26,7 +26,7 @@ export function TattooDialog({
   onSave,
   initialData,
 }: TattooDialogProps) {
-  const [photo, setPhoto] = useState<File | null>(null);
+  const [photo, setPhoto] = useState<File | string| null>(null);
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
 
@@ -115,3 +115,4 @@ export function TattooDialog({
     </Dialog>
   );
 }
+

@@ -14,22 +14,32 @@ import {
   registerPersonSchema,
   type RegisterPersonFormData,
 } from "@/schemas/person.schema";
-import { peopleService } from "@/services/people.service";
-import { mediaService } from "@/services/media.service";
+import { usePersonWithMedia } from "@/hooks/queries/usePersonWithMedia";
+import { useUpdatePerson } from "@/hooks/mutations/usePeopleMutations";
+import { useBulkMediaOperations } from "@/hooks/mutations/useMediaMutations";
 import { uploadService } from "@/services/upload.service";
 import { cleanCPF } from "@/lib/cpf.utils";
-import { MediaType, type Media } from "@/types/media.types";
-import type { Person } from "@/types/person.types";
+import { MediaType } from "@/types/media.types";
 import { UploadCategory } from "@/types/upload-category";
 
 export function EditPersonPage() {
   const { id } = useParams<{ id: string }>();
+  const personId = id ? Number(id) : undefined;
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [person, setPerson] = useState<Person | null>(null);
-  const [existingMedias, setExistingMedias] = useState<Media[]>([]);
   const [mediasToDelete, setMediasToDelete] = useState<number[]>([]);
+
+  // Fetch person and media data with TanStack Query
+  const {
+    person,
+    media: existingMedias,
+    isLoading,
+    isError,
+  } = usePersonWithMedia(personId);
+
+  // Mutations
+  const updatePersonMutation = useUpdatePerson(person?.id ?? 0);
+  const mediaOperations = useBulkMediaOperations(person?.id ?? 0);
 
   const form = useForm<RegisterPersonFormData>({
     resolver: zodResolver(registerPersonSchema),
@@ -56,70 +66,44 @@ export function EditPersonPage() {
     },
   });
 
-  // Load person data and media
+  // Initialize form with person data (stable dependencies)
   useEffect(() => {
-    const loadData = async () => {
-      if (!id) {
-        toast.error("ID da pessoa não encontrado");
-        navigate("/app/home");
-        return;
-      }
+    if (!person || !existingMedias) return;
 
-      try {
-        setIsLoading(true);
-        const [personData, mediaData] = await Promise.all([
-          peopleService.getById(Number(id)),
-          mediaService.getByPersonId(Number(id)),
-        ]);
+    const existingTattooMedias = existingMedias.filter(
+      (m) => m.type === MediaType.TATTOO
+    );
 
-        setPerson(personData);
-        setExistingMedias(mediaData);
-
-
-        const existingTattooMedias = mediaData.filter(
-          (m) => m.type === MediaType.TATTOO
-        );  
-
-        // Pre-fill form with person data
-        form.reset({
-          facePhoto: null,
-          fullBodyPhoto: null,
-          tattoos: existingTattooMedias.map((m) => ({
-           photo: m.url, // Placeholder File object
-            location: m.label || "",
-            description: m.description || "",
-          })),
-          fullName: personData.fullName,
-          nickname: personData.nickname || "",
-          cpf: personData.cpf || "",
-          rg: personData.rg || "",
-          voterId: personData.voterId || "",
-          motherName: personData.motherName || "",
-          fatherName: personData.fatherName || "",
-          addressPrimary: personData.addressPrimary || "",
-          addressSecondary: personData.addressSecondary || "",
-          latitude: personData.latitude,
-          longitude: personData.longitude,
-          hasWarrant: !!personData.warrantStatus,
-          warrantStatus: personData.warrantStatus || "",
-          warrantFile: null,
-          isConfidential: personData.isConfidential,
-          notes: personData.notes || "",
-        });
-      } catch (error) {
-        console.error(error);
-        toast.error("Erro ao carregar dados da pessoa");
-        navigate("/app/home");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, [id, navigate, form]);
+    // Pre-fill form with person data
+    form.reset({
+      facePhoto: null,
+      fullBodyPhoto: null,
+      tattoos: existingTattooMedias.map((m) => ({
+        photo: m.url,
+        location: m.label || "",
+        description: m.description || "",
+      })),
+      fullName: person.fullName,
+      nickname: person.nickname || "",
+      cpf: person.cpf || "",
+      rg: person.rg || "",
+      voterId: person.voterId || "",
+      motherName: person.motherName || "",
+      fatherName: person.fatherName || "",
+      addressPrimary: person.addressPrimary || "",
+      addressSecondary: person.addressSecondary || "",
+      latitude: person.latitude,
+      longitude: person.longitude,
+      hasWarrant: !!person.warrantStatus,
+      warrantStatus: person.warrantStatus || "",
+      warrantFile: null,
+      isConfidential: person.isConfidential,
+      notes: person.notes || "",
+    });
+  }, [person, existingMedias, form]);
 
   const onSubmit = async (data: RegisterPersonFormData) => {
-    if (!person) return;
+    if (!person || !existingMedias) return;
 
     try {
       setIsSaving(true);
@@ -202,8 +186,8 @@ export function EditPersonPage() {
         warrantUrl = uploadedUrls[urlIndex];
       }
 
-      // 2. Update person record
-      await peopleService.update(person.id, {
+      // 2. Update person record via mutation
+      await updatePersonMutation.mutateAsync({
         fullName: data.fullName,
         nickname: data.nickname || undefined,
         cpf: data.cpf ? cleanCPF(data.cpf) : undefined,
@@ -221,59 +205,51 @@ export function EditPersonPage() {
         isConfidential: data.isConfidential,
       });
 
-      // 3. Manage media changes
-      const mediaPromises: Promise<unknown>[] = [];
+      // 3. Manage media changes via bulk operations
+      const mediaToCreate = [];
+      const mediaToDelete = [];
 
       // Create new face photo if uploaded
       if (needFaceUpload && faceUrl) {
-        mediaPromises.push(
-          mediaService.create({
-            type: MediaType.FACE,
-            url: faceUrl,
-            personId: person.id,
-          })
-        );
+        mediaToCreate.push({
+          type: MediaType.FACE,
+          url: faceUrl,
+          personId: person.id,
+        });
       }
 
       // Create new body photo if uploaded
       if (needBodyUpload && bodyUrl) {
-        mediaPromises.push(
-          mediaService.create({
-            type: MediaType.FULL_BODY,
-            url: bodyUrl,
-            personId: person.id,
-          })
-        );
+        mediaToCreate.push({
+          type: MediaType.FULL_BODY,
+          url: bodyUrl,
+          personId: person.id,
+        });
       }
 
       // Delete old tattoos (we're replacing all tattoos with the new set)
-      existingTattoos.forEach((tattoo) => {
-        mediaPromises.push(mediaService.delete(tattoo.id));
-      });
+      mediaToDelete.push(...existingTattoos.map((t) => t.id));
 
       // Create new tattoos
-      mediaPromises.push(
-        ...data.tattoos.map((tattoo, index) =>
-          mediaService.create({
-            type: MediaType.TATTOO,
-            url: tattooUrls[index],
-            label: tattoo.location,
-            description: tattoo.description || undefined,
-            personId: person.id,
-          })
-        )
+      mediaToCreate.push(
+        ...data.tattoos.map((tattoo, index) => ({
+          type: MediaType.TATTOO,
+          url: tattooUrls[index],
+          label: tattoo.location,
+          description: tattoo.description || undefined,
+          personId: person.id,
+        }))
       );
 
       // Delete marked media
-      mediasToDelete.forEach((mediaId) => {
-        mediaPromises.push(mediaService.delete(mediaId));
+      mediaToDelete.push(...mediasToDelete);
+
+      await mediaOperations.mutateAsync({
+        create: mediaToCreate,
+        delete: mediaToDelete,
       });
 
-      await Promise.all(mediaPromises);
-
-      // 4. Feedback and navigation
-      toast.success("Cadastro atualizado com sucesso!");
-      navigate(`/app/people/${person.id}`);
+      // Navigation and toast handled by mutation's onSuccess
     } catch (error) {
       console.error(error);
       toast.error("Erro ao atualizar cadastro. Tente novamente.");
@@ -281,6 +257,13 @@ export function EditPersonPage() {
       setIsSaving(false);
     }
   };
+
+  // Handle error state
+  if (isError) {
+    toast.error("Erro ao carregar dados da pessoa");
+    navigate("/app/home");
+    return null;
+  }
 
   if (isLoading) {
     return (
@@ -290,7 +273,7 @@ export function EditPersonPage() {
     );
   }
 
-  if (!person) {
+  if (!person || !existingMedias) {
     return null;
   }
 

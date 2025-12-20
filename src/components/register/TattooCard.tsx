@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { Edit, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,24 +19,27 @@ export function TattooCard({
   onEdit,
   onRemove,
 }: TattooCardProps) {
-  const [preview, setPreview] = useState<string | null>(null);
-
-  useEffect(() => {
+  // Deriva o preview diretamente de photo sem estado extra
+  const preview = useMemo(() => {
     // Caso 1: Se for uma string (URL do backend/R2)
     if (typeof photo === "string") {
-      setPreview(photo);
-      return; // Não precisa de cleanup para strings
+      return photo;
     }
 
     // Caso 2: Se for um File (Upload novo do usuário)
     if (photo instanceof File) {
-      const url = URL.createObjectURL(photo);
-      setPreview(url);
-
-      // Cleanup de memória quando o componente desmontar ou a foto mudar
-      return () => URL.revokeObjectURL(url);
+      return URL.createObjectURL(photo);
     }
+
+    return null;
   }, [photo]);
+
+  // Cleanup do object URL quando o componente desmontar ou photo mudar
+  useEffect(() => {
+    if (photo instanceof File && preview) {
+      return () => URL.revokeObjectURL(preview);
+    }
+  }, [photo, preview]);
 
   return (
     <Card>

@@ -4,8 +4,14 @@ import type {
   CreatePersonDto,
   UpdatePersonDto,
 } from "@/types/person.types";
+import type { PaginatedResponse, SearchFilters } from "@/types/common.types";
 
 export const peopleService = {
+  async getAll(params: SearchFilters): Promise<PaginatedResponse<Person>> {
+    const response = await api.get<PaginatedResponse<Person>>("/people", { params });
+    return response.data;
+  },
+
   async create(data: CreatePersonDto): Promise<Person> {
     const response = await api.post<Person>("/people", data);
     return response.data;

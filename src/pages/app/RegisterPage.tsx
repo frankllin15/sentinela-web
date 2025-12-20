@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,7 @@ import {
   registerPersonSchema,
   type RegisterPersonFormData,
 } from "@/schemas/person.schema";
-import { peopleService } from "@/services/people.service";
+import { useCreatePerson } from "@/hooks/mutations/usePeopleMutations";
 import { mediaService } from "@/services/media.service";
 import { uploadService } from "@/services/upload.service";
 import { cleanCPF } from "@/lib/cpf.utils";
@@ -22,8 +21,8 @@ import { Loader2 } from "lucide-react";
 import { UploadCategory } from "@/types/upload-category";
 
 export function RegisterPage() {
-  const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+  const createPersonMutation = useCreatePerson();
 
   const form = useForm<RegisterPersonFormData>({
     resolver: zodResolver(registerPersonSchema),
@@ -73,10 +72,10 @@ export function RegisterPage() {
 
       // Tatuagens -> Pasta 'tattoos'
       if (data.tattoos.length > 0) {
-        // Mapeia todas as tattoos enviando a categoria correta
-        const tattooUploads = data.tattoos.map((t) =>
-          uploadService.upload(t.photo, UploadCategory.TATTOO)
-        );
+        // Mapeia todas as tattoos enviando a categoria correta (apenas Files, não URLs)
+        const tattooUploads = data.tattoos
+          .filter((t) => t.photo instanceof File)
+          .map((t) => uploadService.upload(t.photo as File, UploadCategory.TATTOO));
         uploadPromises.push(...tattooUploads);
       }
 
@@ -100,8 +99,8 @@ export function RegisterPage() {
       urlIndex += data.tattoos.length;
       const warrantUrl = data.warrantFile ? uploadedUrls[urlIndex] : undefined;
 
-      // 2. Criar registro de pessoa
-      const person = await peopleService.create({
+      // 2. Criar registro de pessoa via mutation
+      const person = await createPersonMutation.mutateAsync({
         fullName: data.fullName,
         nickname: data.nickname || undefined,
         cpf: data.cpf ? cleanCPF(data.cpf) : undefined,
@@ -156,9 +155,7 @@ export function RegisterPage() {
 
       await Promise.all(mediaPromises);
 
-      // 4. Feedback e redirecionamento
-      toast.success("Cadastro realizado com sucesso!");
-      navigate(`/app/people/${person.id}`);
+      // Navigation and toast handled by mutation's onSuccess
     } catch (error) {
       console.error(error);
       toast.error("Erro ao salvar cadastro. Tente novamente.");

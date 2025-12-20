@@ -18,6 +18,7 @@ export interface Person {
   createdBy: number;
   createdAt: string;
   updatedAt: string;
+  facePhotoUrl?: string;
 }
 
 export interface CreatePersonDto {

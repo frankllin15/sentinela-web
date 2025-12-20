@@ -32,7 +32,7 @@ export function MediaSection({ control, existingFacePhoto, existingBodyPhoto }: 
   
   });
 
-  const handleSaveTattoo = (data: { photo: File; location: string; description?: string }) => {
+  const handleSaveTattoo = (data: { photo: File | string; location: string; description?: string }) => {
     if (editingIndex !== null) {
       update(editingIndex, data);
       setEditingIndex(null);

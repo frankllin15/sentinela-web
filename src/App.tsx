@@ -8,6 +8,7 @@ import { AppLayout } from '@/layouts/AppLayout';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { HomePage } from '@/pages/app/HomePage';
 import { RegisterPage } from '@/pages/app/RegisterPage';
+import { SearchPage } from '@/pages/app/SearchPage';
 import { PeoplePage } from '@/pages/app/PeoplePage';
 import { EditPersonPage } from '@/pages/app/EditPersonPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -43,6 +44,7 @@ function App() {
       >
         <Route path="home" element={<HomePage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="search" element={<SearchPage />} />
         <Route path="people/:id" element={<PeoplePage />} />
         <Route path="people/:id/edit" element={<EditPersonPage />} />
       </Route>

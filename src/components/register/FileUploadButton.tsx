@@ -1,9 +1,9 @@
-import { useRef, useState, useEffect } from 'react';
-import { Camera, X, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useRef, useMemo, useEffect } from "react";
+import { Camera, X, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface FileUploadButtonProps {
-  value?: File | null;
+  value?: File | string | null;
   onChange: (file: File | null) => void;
   label: string;
   accept?: string;
@@ -16,23 +16,29 @@ export function FileUploadButton({
   value,
   onChange,
   label,
-  accept = 'image/*',
+  accept = "image/*",
   capture = true,
   existingImageUrl,
   onRemoveExisting,
 }: FileUploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (value) {
-      const url = URL.createObjectURL(value);
-      setPreview(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setPreview(null);
+  // Deriva o preview diretamente de value sem estado extra
+  const preview = useMemo(() => {
+    if (value instanceof File) {
+      return URL.createObjectURL(value);
+    } else if (typeof value === "string") {
+      return value;
     }
+    return null;
   }, [value]);
+
+  // Cleanup do object URL quando o componente desmontar ou value mudar
+  useEffect(() => {
+    if (value instanceof File && preview) {
+      return () => URL.revokeObjectURL(preview);
+    }
+  }, [value, preview]);
 
   return (
     <div className="space-y-2">
@@ -40,7 +46,7 @@ export function FileUploadButton({
         ref={inputRef}
         type="file"
         accept={accept}
-        capture={capture ? 'environment' : undefined}
+        capture={capture ? "environment" : undefined}
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];

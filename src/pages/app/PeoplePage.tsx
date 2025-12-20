@@ -1,53 +1,28 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loader2, User, Image, MapPin } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PersonHeader } from "@/components/people/PersonHeader";
 import { PersonDataTab } from "@/components/people/PersonDataTab";
 import { PersonGalleryTab } from "@/components/people/PersonGalleryTab";
 import { PersonMapTab } from "@/components/people/PersonMapTab";
 import { AuditInfo } from "@/components/people/AuditInfo";
-import { peopleService } from "@/services/people.service";
-import { mediaService } from "@/services/media.service";
-import type { Person } from "@/types/person.types";
-import type { Media } from "@/types/media.types";
+import { usePersonWithMedia } from "@/hooks/queries/usePersonWithMedia";
 
 type TabType = "dados" | "galeria" | "mapa";
 
 export function PeoplePage() {
   const { id } = useParams<{ id: string }>();
-  const [person, setPerson] = useState<Person | null>(null);
-  const [medias, setMedias] = useState<Media[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const personId = id ? Number(id) : undefined;
   const [activeTab, setActiveTab] = useState<TabType>("dados");
 
-  useEffect(() => {
-    const fetchPerson = async () => {
-      if (!id) return;
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        const personData = await peopleService.getById(Number(id));
-        setPerson(personData);
-
-        // TODO: Buscar mídias quando o endpoint estiver disponível
-        const mediasData = await mediaService.getByPersonId(Number(id));
-        setMedias(mediasData);
-      } catch (err) {
-        console.error(err);
-        setError("Erro ao carregar dados da pessoa");
-        toast.error("Erro ao carregar dados da pessoa");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPerson();
-  }, [id]);
+  // Fetch person and media data with TanStack Query
+  const {
+    person,
+    media: medias,
+    isLoading: loading,
+    isError,
+  } = usePersonWithMedia(personId);
 
   if (loading) {
     return (
@@ -60,13 +35,13 @@ export function PeoplePage() {
     );
   }
 
-  if (error || !person) {
+  if (isError || !person || !medias) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Pessoa não encontrada</h2>
           <p className="text-muted-foreground mb-4">
-            {error || "A pessoa solicitada não foi encontrada."}
+            A pessoa solicitada não foi encontrada.
           </p>
           <Button onClick={() => window.history.back()}>Voltar</Button>
         </div>

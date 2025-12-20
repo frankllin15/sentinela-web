@@ -52,8 +52,11 @@ export function HomePage() {
             <p className="text-sm text-muted-foreground">
               Buscar indivíduos cadastrados
             </p>
-            <Button className="mt-4 w-full" disabled>
-              Em breve
+            <Button
+              className="mt-4 w-full"
+              onClick={() => navigate(ROUTES.SEARCH)}
+            >
+              Buscar Pessoas
             </Button>
           </CardContent>
         </Card>
