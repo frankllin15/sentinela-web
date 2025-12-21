@@ -17,7 +17,7 @@ export function SearchPage() {
   const [filterValues, setFilterValues] = useState<FilterFormValues>({});
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
-  const { data, isLoading, error } = usePeopleList({
+  const { data, isLoading, error, refetch } = usePeopleList({
     ...filterValues,
     page,
     limit: DEFAULT_LIMIT,
@@ -32,6 +32,8 @@ export function SearchPage() {
   const handleApplyFilters = (filters: FilterFormValues) => {
     setFilterValues(filters);
     setPage(1);
+    // Força uma nova consulta mesmo que os filtros sejam iguais
+    setTimeout(() => refetch(), 0);
   };
 
   const handleClearFilters = () => {
