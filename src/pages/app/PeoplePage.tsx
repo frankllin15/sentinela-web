@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { Loader2, User, Image, MapPin } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Loader2, User, Image, MapPin, Home, Search, Shield, AlertTriangle, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PersonHeader } from "@/components/people/PersonHeader";
+import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { PersonDataTab } from "@/components/people/PersonDataTab";
 import { PersonGalleryTab } from "@/components/people/PersonGalleryTab";
 import { PersonMapTab } from "@/components/people/PersonMapTab";
@@ -14,6 +15,7 @@ type TabType = "dados" | "galeria" | "mapa";
 export function PeoplePage() {
   const { id } = useParams<{ id: string }>();
   const personId = id ? Number(id) : undefined;
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>("dados");
 
   // Fetch person and media data with TanStack Query
@@ -50,8 +52,48 @@ export function PeoplePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto pb-8">
-      <PersonHeader person={person} />
+    <div className="max-w-5xl mx-auto pb-8">
+      <PageHeader
+        title={person.fullName}
+        subtitle={person.nickname ? `Vulgo: ${person.nickname}` : undefined}
+        breadcrumbs={[
+          { label: "Início", href: "/app/home", icon: Home },
+          { label: "Buscar", href: "/app/search", icon: Search },
+          { label: person.fullName },
+        ]}
+        showBackButton
+        backButtonText="Voltar"
+        sticky
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/app/people/${person.id}/edit`)}
+            className="gap-2"
+          >
+            <Edit className="h-4 w-4" />
+            Editar
+          </Button>
+        }
+      >
+        {/* Badges de status */}
+        {(person.isConfidential || person.warrantStatus) && (
+          <div className="flex gap-2 mt-3">
+            {person.isConfidential && (
+              <Badge variant="secondary" className="gap-1">
+                <Shield className="h-3 w-3" />
+                Sigiloso
+              </Badge>
+            )}
+            {person.warrantStatus && (
+              <Badge variant="destructive" className="gap-1">
+                <AlertTriangle className="h-3 w-3" />
+                Mandado de Prisão
+              </Badge>
+            )}
+          </div>
+        )}
+      </PageHeader>
 
       {/* Tab Navigation */}
       <div className="flex gap-2 mb-6 border-b border-border overflow-x-auto">

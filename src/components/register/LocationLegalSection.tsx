@@ -38,11 +38,11 @@ export function LocationLegalSection({ control, setValue }: LocationLegalSection
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold mb-1">
-          Seção C: Localização e Informações Legais
+          Localização e Informações Legais
         </h2>
         <p className="text-sm text-muted-foreground">
           Endereço, geolocalização e status legal
-        </p>
+        </p> 
       </div>
 
       <div className="space-y-4">

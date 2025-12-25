@@ -27,7 +27,7 @@ export function PersonalDataSection({ control, personId }: PersonalDataSectionPr
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold mb-1">
-          Seção B: Dados Pessoais
+          Dados Pessoais
         </h2>
         <p className="text-sm text-muted-foreground">
           Informações de identificação do indivíduo

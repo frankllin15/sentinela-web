@@ -4,21 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { UserCircle, Search, UserPlus } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 export function HomePage() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Bem-vindo ao Sentinela</h1>
-        {user && (
-          <p className="mt-2 text-muted-foreground">
-            Olá, {user.email} ({user.role.replace('_', ' ').toUpperCase()})
-          </p>
-        )}
-      </div>
+    <div className="max-w-6xl mx-auto pb-8 space-y-6">
+      <PageHeader
+        title="Bem-vindo ao Sentinela"
+        subtitle={
+          user
+            ? `Olá, ${user.email} (${user.role.replace("_", " ").toUpperCase()})`
+            : undefined
+        }
+        breadcrumbs={[{ label: "Início" }]}
+      />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card className="hover:border-primary transition-colors cursor-pointer">

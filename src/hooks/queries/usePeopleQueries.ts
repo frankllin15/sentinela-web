@@ -31,8 +31,17 @@ export function usePersonByCpf(
 }
 
 export function usePeopleList(filters: SearchFilters) {
+  // Converter isConfidential de string para boolean se necessário
+  const processedFilters: SearchFilters = {
+    ...filters,
+    isConfidential:
+      typeof filters.isConfidential === 'string' && filters.isConfidential !== ''
+        ? filters.isConfidential === 'true'
+        : filters.isConfidential as boolean | undefined,
+  };
+
   return useQuery({
-    queryKey: queryKeys.people.list(filters),
-    queryFn: () => peopleService.getAll(filters),
+    queryKey: queryKeys.people.list(processedFilters),
+    queryFn: () => peopleService.getAll(processedFilters),
   });
 }

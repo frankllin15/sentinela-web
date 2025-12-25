@@ -17,8 +17,9 @@ import { mediaService } from "@/services/media.service";
 import { uploadService } from "@/services/upload.service";
 import { cleanCPF } from "@/lib/cpf.utils";
 import { MediaType } from "@/types/media.types";
-import { Loader2 } from "lucide-react";
+import { Loader2, Home } from "lucide-react";
 import { UploadCategory } from "@/types/upload-category";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export function RegisterPage() {
   const [isSaving, setIsSaving] = useState(false);
@@ -166,14 +167,15 @@ export function RegisterPage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-8">
-      <div className="sticky top-14 md:top-16 z-50 bg-background border-b border-border py-4 mb-6 -mx-4 px-4">
-        <div className="flex items-center justify-between max-w-2xl mx-auto">
-          <div>
-            <h1 className="text-2xl font-bold">Novo Cadastro</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Preencha todos os campos obrigatórios
-            </p>
-          </div>
+      <PageHeader
+        title="Novo Cadastro"
+        subtitle="Preencha todos os campos obrigatórios"
+        breadcrumbs={[
+          { label: "Início", href: "/app/home", icon: Home },
+          { label: "Novo Cadastro" },
+        ]}
+        sticky
+        actions={
           <Button type="submit" form="register-form" disabled={isSaving}>
             {isSaving ? (
               <>
@@ -184,8 +186,8 @@ export function RegisterPage() {
               "Salvar Cadastro"
             )}
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       <Form {...form}>
         <form

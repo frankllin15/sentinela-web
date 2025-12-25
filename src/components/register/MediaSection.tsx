@@ -57,7 +57,7 @@ export function MediaSection({ control, existingFacePhoto, existingBodyPhoto }: 
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold mb-1">
-          Seção A: Evidências (Mídia)
+          Evidências (Mídia)
         </h2>
         <p className="text-sm text-muted-foreground">
           Fotos e identificação visual do indivíduo

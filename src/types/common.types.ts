@@ -10,6 +10,8 @@ export interface SearchFilters {
   nickname?: string;
   cpf?: string;
   motherName?: string;
+  fatherName?: string;
+  isConfidential?: boolean | string;
   page: number;
   limit: number;
 }

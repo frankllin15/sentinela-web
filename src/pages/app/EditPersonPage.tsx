@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2, Home, Search } from "lucide-react";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -21,6 +21,7 @@ import { uploadService } from "@/services/upload.service";
 import { cleanCPF } from "@/lib/cpf.utils";
 import { MediaType } from "@/types/media.types";
 import { UploadCategory } from "@/types/upload-category";
+import { PageHeader } from "@/components/layout/PageHeader";
 
 export function EditPersonPage() {
   const { id } = useParams<{ id: string }>();
@@ -286,24 +287,18 @@ export function EditPersonPage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-8">
-      <div className="sticky top-14 md:top-16 z-50 bg-background border-b border-border py-4 mb-6 -mx-4 px-4">
-        <div className="flex items-center justify-between max-w-2xl mx-auto">
-          <div className="flex items-center gap-3">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(`/app/people/${person.id}`)}
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">Editar Cadastro</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {person.fullName}
-              </p>
-            </div>
-          </div>
+      <PageHeader
+        title="Editar Cadastro"
+        subtitle={person.fullName}
+        breadcrumbs={[
+          { label: "Início", href: "/app/home", icon: Home },
+          { label: "Buscar", href: "/app/search", icon: Search },
+          { label: person.fullName, href: `/app/people/${person.id}` },
+          { label: "Editar" },
+        ]}
+        showBackButton
+        sticky
+        actions={
           <Button type="submit" form="edit-form" disabled={isSaving}>
             {isSaving ? (
               <>
@@ -314,8 +309,8 @@ export function EditPersonPage() {
               "Salvar Alterações"
             )}
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       <Form {...form}>
         <form
