@@ -12,6 +12,7 @@ import { SearchPage } from '@/pages/app/SearchPage';
 import { PeoplePage } from '@/pages/app/PeoplePage';
 import { EditPersonPage } from '@/pages/app/EditPersonPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
+import { UsersPage } from '@/pages/admin/UsersPage';
 import { UserRole } from '@/types/auth.types';
 
 function App() {
@@ -60,17 +61,7 @@ function App() {
           </RoleProtectedRoute>
         }
       >
-        <Route
-          path="users"
-          element={
-            <div className="text-center">
-              <h2 className="text-2xl font-bold">Gestão de Usuários</h2>
-              <p className="mt-2 text-muted-foreground">
-                Funcionalidade em desenvolvimento
-              </p>
-            </div>
-          }
-        />
+        <Route path="users" element={<UsersPage />} />
       </Route>
 
       {/* Default redirects */}

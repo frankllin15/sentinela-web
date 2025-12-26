@@ -11,4 +11,17 @@ export const queryKeys = {
     all: ['media'] as const,
     byPerson: (personId: number) => [...queryKeys.media.all, 'person', personId] as const,
   },
+  users: {
+    all: ['users'] as const,
+    lists: () => [...queryKeys.users.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) => [...queryKeys.users.lists(), filters] as const,
+    details: () => [...queryKeys.users.all, 'detail'] as const,
+    detail: (id: number) => [...queryKeys.users.details(), id] as const,
+  },
+  forces: {
+    all: ['forces'] as const,
+  },
 };
+
+
+

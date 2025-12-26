@@ -10,9 +10,11 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 export interface User {
   id: number;
   email: string;
+  name?: string;
   role: UserRole;
   forceId?: number;
   forceName?: string;
+  isActive: boolean;
   mustChangePassword: boolean;
   createdAt: string;
   updatedAt: string;

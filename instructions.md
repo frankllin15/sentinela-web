@@ -95,3 +95,8 @@ Apenas para `Administrador Geral` e `Ponto Focal`.
     * `Card` (container padrão).
     * `Drawer` (para menus mobile).
     * `Toast` (para feedback de "Salvo com sucesso" ou "Erro de duplicidade").
+
+## 4. Padrão de resposta da API
+* **Paginado:** `{ data: T[], total: number, page: number, limit: number, totalPages: number }`
+
+
