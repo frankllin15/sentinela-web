@@ -17,7 +17,9 @@ export const createUserSchema = z.object({
     UserRole.PONTO_FOCAL,
     UserRole.GESTOR,
     UserRole.USUARIO,
-  ], { required_error: 'Perfil é obrigatório' }),
+  ]).refine((value) => value !== undefined, {
+    message: 'Perfil é obrigatório',
+  }),
   forceId: z.number().optional(),
 });
 

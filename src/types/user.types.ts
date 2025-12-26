@@ -1,4 +1,4 @@
-import { User, UserRole } from './auth.types';
+import { type User, UserRole } from './auth.types';
 
 export type { User };
 
