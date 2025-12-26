@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Users, Plus, Home, Shield, Trash2, Ban, CheckCircle, Loader2 } from 'lucide-react';
+import { Users, Plus, Home, Shield, Trash2, Ban, CheckCircle, Loader2, MoreVertical, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -12,12 +12,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,12 +30,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { UserFormDialog } from '@/components/admin/UserFormDialog';
+import { UserFilterSheet } from '@/components/admin/UserFilterSheet';
 import { Pagination } from '@/components/search/Pagination';
 import { useUserList } from '@/hooks/queries/useUserQueries';
-import { useForceList } from '@/hooks/queries/useForceQueries';
 import { useDeleteUser, useToggleUserStatus } from '@/hooks/mutations/useUserMutations';
 import { UserRole } from '@/types/auth.types';
 import type { UserSearchFilters } from '@/types/user.types';
+import type { UserFilterFormValues } from '@/components/admin/UserFilters';
 
 const DEFAULT_LIMIT = 20;
 
@@ -56,52 +57,58 @@ type ConfirmAction = {
 export function UsersPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
 
   // Read from URL params
   const page = Number(searchParams.get("page")) || 1;
-  const forceId = searchParams.get("forceId");
-  const isActiveParam = searchParams.get("isActive");
+  const filterValues: UserFilterFormValues = {
+    forceId: searchParams.get("forceId") || '',
+    isActive: searchParams.get("isActive") || '',
+  };
 
-  // Build filters
+  // Build filters for query
   const filters: UserSearchFilters = {
     page,
     limit: DEFAULT_LIMIT,
-    ...(forceId && { forceId: Number(forceId) }),
-    ...(isActiveParam && { isActive: isActiveParam === 'true' }),
+    ...(filterValues.forceId && { forceId: Number(filterValues.forceId) }),
+    ...(filterValues.isActive && { isActive: filterValues.isActive === 'true' }),
   };
 
   // Query with filters
   const { data, isLoading, error, refetch } = useUserList(filters);
-  const { data: forces } = useForceList();
   const deleteUserMutation = useDeleteUser();
   const toggleStatusMutation = useToggleUserStatus();
 
   const users = data?.data || [];
   const totalItems = data?.total || 0;
 
-  const handleForceFilter = (value: string) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (value === 'all') {
-      newParams.delete('forceId');
-    } else {
-      newParams.set('forceId', value);
-    }
-    newParams.set('page', '1');
+  // Count active filters
+  const activeFilterCount = Object.values(filterValues).filter(
+    (value) => value && value.trim() !== ""
+  ).length;
+
+  const handleApplyFilters = (filters: UserFilterFormValues) => {
+    const newParams = new URLSearchParams();
+
+    // Add filters to URL (only non-empty values)
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value && value.trim() !== "") {
+        newParams.set(key, value);
+      }
+    });
+
+    // Reset to page 1
+    newParams.set("page", "1");
+
     setSearchParams(newParams);
+
+    // Force refetch
     setTimeout(() => refetch(), 0);
   };
 
-  const handleStatusFilter = (value: string) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (value === 'all') {
-      newParams.delete('isActive');
-    } else {
-      newParams.set('isActive', value);
-    }
-    newParams.set('page', '1');
-    setSearchParams(newParams);
-    setTimeout(() => refetch(), 0);
+  const handleClearFilters = () => {
+    setSearchParams({ page: "1" });
   };
 
   const handlePageChange = (newPage: number) => {
@@ -151,44 +158,27 @@ export function UsersPage() {
           { label: 'Usuários' },
         ]}
         actions={
-          <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Novo Usuário
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsFilterSheetOpen(true)}
+              className="gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Filtros
+              {activeFilterCount > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </Button>
+            <Button onClick={() => setIsCreateDialogOpen(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Novo Usuário
+            </Button>
+          </div>
         }
       />
-
-      {/* Filters Bar */}
-      <div className="flex gap-4 mb-4">
-        <div className="w-48">
-          <Select value={forceId || 'all'} onValueChange={handleForceFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todas as Forças" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as Forças</SelectItem>
-              {forces?.map((force) => (
-                <SelectItem key={force.id} value={force.id.toString()}>
-                  {force.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="w-48">
-          <Select value={isActiveParam || 'all'} onValueChange={handleStatusFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todos os Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="true">Ativos</SelectItem>
-              <SelectItem value="false">Inativos</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
@@ -226,39 +216,53 @@ export function UsersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setConfirmAction({
-                            type: 'toggle',
-                            userId: user.id,
-                            userName: user.name || user.email,
-                            currentStatus: user.isActive,
-                          })}
-                          disabled={toggleStatusMutation.isPending}
-                          title={user.isActive ? 'Desativar' : 'Ativar'}
-                        >
-                          {user.isActive ? (
-                            <Ban className="h-4 w-4 text-orange-500" />
-                          ) : (
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setConfirmAction({
-                            type: 'delete',
-                            userId: user.id,
-                            userName: user.name || user.email,
-                          })}
-                          disabled={deleteUserMutation.isPending}
-                          title="Excluir"
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            disabled={toggleStatusMutation.isPending || deleteUserMutation.isPending}
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                            <span className="sr-only">Abrir menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => setConfirmAction({
+                              type: 'toggle',
+                              userId: user.id,
+                              userName: user.name || user.email,
+                              currentStatus: user.isActive,
+                            })}
+                          >
+                            {user.isActive ? (
+                              <>
+                                <Ban className="mr-2 h-4 w-4 text-orange-500" />
+                                <span>Desativar</span>
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                                <span>Ativar</span>
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => setConfirmAction({
+                              type: 'delete',
+                              userId: user.id,
+                              userName: user.name || user.email,
+                            })}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Excluir</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))
@@ -287,6 +291,14 @@ export function UsersPage() {
       )}
 
       <UserFormDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
+
+      <UserFilterSheet
+        open={isFilterSheetOpen}
+        onOpenChange={setIsFilterSheetOpen}
+        onApply={handleApplyFilters}
+        onClear={handleClearFilters}
+        initialValues={filterValues}
+      />
 
       {/* Confirmation Dialogs */}
       <AlertDialog open={!!confirmAction} onOpenChange={(open) => !open && setConfirmAction(null)}>
