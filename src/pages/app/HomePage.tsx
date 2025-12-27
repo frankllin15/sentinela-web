@@ -2,7 +2,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Search, UserPlus, Users } from "lucide-react";
+import { HomeIcon, Search, UserPlus, Users } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { UserRole } from "@/types/auth.types";
@@ -20,12 +20,12 @@ export function HomePage() {
         title="Bem-vindo ao Sentinela"
         subtitle={
           user
-            ? `Olá, ${user.email} (${user.role
+            ? `Olá, ${user.name} (${user.role
                 .replace("_", " ")
                 .toUpperCase()})`
             : undefined
         }
-        breadcrumbs={[{ label: "Início" }]}
+        breadcrumbs={[{ label: "Início", icon: HomeIcon }]}
       />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

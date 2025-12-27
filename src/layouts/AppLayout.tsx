@@ -17,10 +17,11 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card sticky top-0 z-40">
+      <header className="border-b border-border bg-card sticky top-0 z-40 py-2">
         <div className="container mx-auto flex h-14 md:h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2 md:gap-4">
-            <Link to={ROUTES.HOME}>
+            <Link to={ROUTES.HOME} className="flex items-center gap-2">
+            <img src="/logo.jpeg" alt="Logo" width={64} height={64} />
               <h1 className="text-lg md:text-xl font-bold text-primary">
                 SENTINELA
               </h1>
@@ -32,7 +33,7 @@ export function AppLayout() {
               <div className="flex items-center gap-2 text-sm">
                 <User className="h-4 w-4" />
                 <div className="hidden sm:flex flex-col">
-                  <span className="font-medium">{user.email}</span>
+                  <span className="font-medium">{user.name}</span>
                   <span className="text-xs text-muted-foreground">
                     {user.role.replace("_", " ").toUpperCase()}
                   </span>
