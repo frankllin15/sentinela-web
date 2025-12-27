@@ -1,9 +1,28 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { EmptyState } from './EmptyState';
 
-export function LoadingState() {
+interface LoadingStateProps {
+  count?: number;
+  error?: Error | string;
+  onRetry?: () => void;
+}
+
+export function LoadingState({ count = 8, error, onRetry }: LoadingStateProps) {
+  // Se houver erro, mostra o EmptyState com variant de erro
+  if (error) {
+    return (
+      <EmptyState
+        variant="error"
+        error={error}
+        onRetry={onRetry}
+      />
+    );
+  }
+
+  // Caso contrário, mostra skeleton loading
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {Array.from({ length: 8 }).map((_, index) => (
+      {Array.from({ length: count }).map((_, index) => (
         <Card key={index}>
           <CardContent className="p-4">
             <div className="flex items-start gap-4">

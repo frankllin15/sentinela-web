@@ -15,5 +15,8 @@ export function useUserById(id: number | undefined, options?: { enabled?: boolea
     queryKey: queryKeys.users.detail(id!),
     queryFn: () => userService.getById(id!),
     enabled: !!id && (options?.enabled ?? true),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
   });
 }

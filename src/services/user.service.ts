@@ -4,7 +4,7 @@ import type { PaginatedResponse } from '@/types/common.types';
 
 export const userService = {
   async getAll(params: UserSearchFilters): Promise<PaginatedResponse<User>> {
-    const response = await api.get<PaginatedResponse<User>>('/users', { params });
+    const response = await api.get<PaginatedResponse<User>>('/users', { params, silent: true });
     return response.data;
   },
 

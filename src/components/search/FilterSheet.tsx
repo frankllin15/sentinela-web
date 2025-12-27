@@ -4,8 +4,8 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet';
-import { SearchFilters, type FilterFormValues } from './SearchFilters';
+} from "@/components/ui/sheet";
+import { SearchFilters, type FilterFormValues } from "./SearchFilters";
 
 interface FilterSheetProps {
   open: boolean;
@@ -34,7 +34,10 @@ export function FilterSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-md px-4">
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-md px-4 overflow-y-auto"
+      >
         <SheetHeader>
           <SheetTitle>Filtros de Busca</SheetTitle>
           <SheetDescription>
@@ -42,13 +45,11 @@ export function FilterSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6">
-          <SearchFilters
-            onApply={handleApply}
-            onClear={handleClear}
-            initialValues={initialValues}
-          />
-        </div>
+        <SearchFilters
+          onApply={handleApply}
+          onClear={handleClear}
+          initialValues={initialValues}
+        />
       </SheetContent>
     </Sheet>
   );

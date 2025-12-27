@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { toasts } from "@/lib/toast.utils";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -159,7 +159,7 @@ export function RegisterPage() {
       // Navigation and toast handled by mutation's onSuccess
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao salvar cadastro. Tente novamente.");
+      toasts.error("Erro ao salvar cadastro. Tente novamente");
     } finally {
       setIsSaving(false);
     }

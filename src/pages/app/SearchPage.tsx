@@ -20,13 +20,14 @@ export function SearchPage() {
 
   // Ler filtros e página da URL
   const page = Number(searchParams.get("page")) || 1;
+  const isConfidentialParam = searchParams.get("isConfidential");
   const filterValues: FilterFormValues = {
     fullName: searchParams.get("fullName") || '',
     nickname: searchParams.get("nickname") || '',
     cpf: searchParams.get("cpf") || '',
     motherName: searchParams.get("motherName") || '',
     fatherName: searchParams.get("fatherName") || '',
-    isConfidential: searchParams.get("isConfidential") || '',
+    isConfidential: isConfidentialParam === 'true' ? true : isConfidentialParam === 'false' ? false : undefined,
   };
 
   const { data, isLoading, error, refetch } = usePeopleList({
@@ -35,8 +36,11 @@ export function SearchPage() {
     limit: DEFAULT_LIMIT,
   });
 
-  const activeFilterCount = Object.values(filterValues).filter(
-    (value) => value && value.trim() !== ""
+  const activeFilterCount = Object.entries(filterValues).filter(
+    ([key, value]) => {
+      if (key === 'isConfidential') return value !== undefined;
+      return typeof value === 'string' && value.trim() !== '';
+    }
   ).length;
 
   const hasActiveFilters = activeFilterCount > 0;
@@ -46,7 +50,7 @@ export function SearchPage() {
 
     // Adicionar filtros na URL (apenas valores não vazios)
     Object.entries(filters).forEach(([key, value]) => {
-      if (value && value.trim() !== "") {
+      if (value && typeof value === "string" && value.trim() !== "") {
         newParams.set(key, value);
       }
     });

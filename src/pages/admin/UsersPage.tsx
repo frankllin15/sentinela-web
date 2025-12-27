@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Users, Plus, Home, Shield, Trash2, Ban, CheckCircle, Loader2, MoreVertical, Filter } from 'lucide-react';
+import { Users, Plus, Home, Shield, Ban, CheckCircle, Loader2, MoreVertical, Filter, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -37,6 +37,7 @@ import { useDeleteUser, useToggleUserStatus } from '@/hooks/mutations/useUserMut
 import { UserRole } from '@/types/auth.types';
 import type { UserSearchFilters } from '@/types/user.types';
 import type { UserFilterFormValues } from '@/components/admin/UserFilters';
+import { ErrorAlert } from '@/components/ui/error-alert';
 
 const DEFAULT_LIMIT = 20;
 
@@ -57,6 +58,7 @@ type ConfirmAction = {
 export function UsersPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<number | undefined>(undefined);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
 
@@ -135,13 +137,12 @@ export function UsersPage() {
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto pb-8">
-        <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-          <p className="text-lg text-destructive mb-4">
-            Erro ao carregar usuários. Por favor, tente novamente.
-          </p>
-          <Button onClick={() => window.location.reload()}>Recarregar</Button>
-        </div>
+      <div className="max-w-7xl mx-auto p-4">
+        <ErrorAlert
+          error={error}
+          title="Erro ao carregar usuários"
+          onRetry={() => refetch()}
+        />
       </div>
     );
   }
@@ -230,6 +231,13 @@ export function UsersPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
+                            onClick={() => setEditingUserId(user.id)}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            <span>Editar</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
                             onClick={() => setConfirmAction({
                               type: 'toggle',
                               userId: user.id,
@@ -250,7 +258,7 @@ export function UsersPage() {
                             )}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem
+                          {/* <DropdownMenuItem
                             onClick={() => setConfirmAction({
                               type: 'delete',
                               userId: user.id,
@@ -260,7 +268,7 @@ export function UsersPage() {
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             <span>Excluir</span>
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -291,6 +299,13 @@ export function UsersPage() {
       )}
 
       <UserFormDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
+
+      
+      <UserFormDialog
+        open={!!editingUserId}
+        onOpenChange={(open) => !open && setEditingUserId(undefined)}
+        userId={editingUserId}
+      />
 
       <UserFilterSheet
         open={isFilterSheetOpen}

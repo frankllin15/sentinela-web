@@ -10,8 +10,7 @@ import {
   FormLabel,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { X } from 'lucide-react';
 
 const filterSchema = z.object({
@@ -20,7 +19,9 @@ const filterSchema = z.object({
   cpf: z.string().optional(),
   motherName: z.string().optional(),
   fatherName: z.string().optional(),
-  isConfidential: z.string().optional(),
+  isConfidential: z.boolean().optional(),
+  //filtro de meus registros
+  isMyRecords: z.boolean().optional(),
 });
 
 export type FilterFormValues = z.infer<typeof filterSchema>;
@@ -44,7 +45,8 @@ export function SearchFilters({
       cpf: '',
       motherName: '',
       fatherName: '',
-      isConfidential: '',
+      isConfidential: false,
+      isMyRecords: false,
       ...initialValues,
     },
   });
@@ -56,14 +58,16 @@ export function SearchFilters({
       cpf: '',
       motherName: '',
       fatherName: '',
-      isConfidential: '',
+      isConfidential: false,
+      isMyRecords: false,
     });
     onClear();
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onApply)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onApply)} className="flex flex-col h-full">
+        <div className="flex-1 overflow-y-auto space-y-4 pr-2">
         <FormField
           control={form.control}
           name="fullName"
@@ -138,39 +142,46 @@ export function SearchFilters({
           control={form.control}
           name="isConfidential"
           render={({ field }) => (
-            <FormItem className="space-y-3">
-              <FormLabel>Confidencial</FormLabel>
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Confidencial</FormLabel>
+                <div className="text-sm text-muted-foreground">
+                  Exibir apenas registros confidenciais
+                </div>
+              </div>
               <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  className="flex flex-col space-y-1"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="" id="all" />
-                    <Label htmlFor="all" className="font-normal cursor-pointer">
-                      Todos
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="true" id="confidential" />
-                    <Label htmlFor="confidential" className="font-normal cursor-pointer">
-                      Apenas confidenciais
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="false" id="non-confidential" />
-                    <Label htmlFor="non-confidential" className="font-normal cursor-pointer">
-                      Apenas não confidenciais
-                    </Label>
-                  </div>
-                </RadioGroup>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             </FormItem>
           )}
         />
 
-        <div className="flex gap-2 pt-4">
+        <FormField
+          control={form.control}
+          name="isMyRecords"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Meus Registros</FormLabel>
+                <div className="text-sm text-muted-foreground">
+                  Exibir apenas registros criados por mim
+                </div>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        </div>
+
+        <div className="flex gap-2 pt-4 border-t bg-background sticky bottom-0 mt-4 pb-2">
           <Button type="submit" className="flex-1">
             Aplicar Filtros
           </Button>
