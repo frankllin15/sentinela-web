@@ -79,7 +79,7 @@ export function SearchPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Buscar Pessoas</h1>
+          <h1 className="text-3xl font-bold">Buscar Indivíduos</h1>
         </div>
 
         <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
@@ -95,7 +95,7 @@ export function SearchPage() {
   return (
     <div className="max-w-6xl mx-auto pb-8 space-y-6">
       <PageHeader
-        title="Buscar Pessoas"
+        title="Buscar Indivíduos"
         icon={Search}
         breadcrumbs={[
           { label: "Início", href: "/app/home", icon: Home },

@@ -27,6 +27,18 @@ export function HomePage() {
         }
         breadcrumbs={[{ label: "Início", icon: HomeIcon }]}
       />
+       {/* MARCA D'ÁGUA (Watermark) 
+        - Fixa no fundo
+        - Opacidade muito baixa (5%) para não atrapalhar a leitura
+        - Pointer-events-none para permitir clicar através dela
+      */}
+      <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none select-none">
+        <div className="relative  opacity-[0.05]">
+           <img src="/logo.png" className="w-125 h-125 object-contain" />
+           <div className="absolute inset-0 flex items-center justify-center">
+           </div>
+        </div>
+      </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card className="hover:border-primary transition-colors cursor-pointer">
@@ -64,7 +76,7 @@ export function HomePage() {
               className="mt-4 w-full"
               onClick={() => navigate(ROUTES.SEARCH)}
             >
-              Buscar Pessoas
+              Buscar Indivíduos
             </Button>
           </CardContent>
         </Card>
