@@ -19,11 +19,7 @@ export function HomePage() {
       <PageHeader
         title="Bem-vindo ao Sentinela"
         subtitle={
-          user
-            ? `Olá, ${user.name} (${user.role
-                .replace("_", " ")
-                .toUpperCase()})`
-            : undefined
+          "Sistema de Gestão de Indivíduos para Forças Policiais"
         }
         breadcrumbs={[{ label: "Início", icon: HomeIcon }]}
       />
@@ -34,7 +30,7 @@ export function HomePage() {
       */}
       <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none select-none">
         <div className="relative  opacity-[0.05]">
-           <img src="/logo.png" className="w-125 h-125 object-contain" />
+           <img src="/logo.png" className="w-125 h-[500px] object-contain" />
            <div className="absolute inset-0 flex items-center justify-center">
            </div>
         </div>
