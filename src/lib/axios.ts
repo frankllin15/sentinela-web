@@ -47,7 +47,27 @@ api.interceptors.response.use(
 
     // 1. Tratamento de Erro de Conexão
     if (!error.response) {
+      // Log detalhado para debug (especialmente útil no mobile)
+      console.error('Erro de rede/timeout:', {
+        message: error.message,
+        code: error.code,
+        url: originalRequest?.url,
+        method: originalRequest?.method,
+        timeout: originalRequest?.timeout,
+      });
+
+      // Verifica se é timeout
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        if (!isSilent) {
+          toast.error('Tempo limite excedido. Tente novamente.');
+        }
+        return Promise.reject(new Error('Timeout na requisição'));
+      }
+
+      // Erro de rede genérico
+      if (!isSilent) {
         toast.error('Não foi possível conectar ao servidor. Verifique sua internet.');
+      }
       return Promise.reject(new Error('Erro de conexão'));
     }
 
