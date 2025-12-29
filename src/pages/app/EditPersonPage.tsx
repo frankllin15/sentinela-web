@@ -152,6 +152,7 @@ export function EditPersonPage() {
       );
 
       if (needWarrantUpload) {
+        console.info("Uploading new warrant file...", data.warrantFile);
         uploadPromises.push(
           uploadService.upload(data.warrantFile!, UploadCategory.WARRANT)
         );
