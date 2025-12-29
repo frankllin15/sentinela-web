@@ -1,5 +1,5 @@
 import { useRef, useMemo, useEffect } from "react";
-import { Camera, X, RefreshCw } from "lucide-react";
+import { Camera, X, RefreshCw, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface FileUploadButtonProps {
@@ -22,6 +22,12 @@ export function FileUploadButton({
   onRemoveExisting,
 }: FileUploadButtonProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isImage = useMemo(() => {
+    if (value instanceof File) return value.type.startsWith("image/");
+    if (typeof value === "string") return value.match(/\.(jpeg|jpg|gif|png)$/i);
+    return false;
+  }, [value]);
 
   // Deriva o preview diretamente de value sem estado extra
   const preview = useMemo(() => {
@@ -57,11 +63,21 @@ export function FileUploadButton({
       {/* Show preview of new file */}
       {preview ? (
         <div className="relative">
-          <img
-            src={preview}
-            alt={label}
-            className="w-full h-48 object-cover rounded-md border"
-          />
+          {isImage ? (
+            <img
+              src={preview}
+              alt={label}
+              className="w-full h-48 object-cover rounded-md border"
+            />
+          ) : (
+            /* Renderização para PDF ou outros documentos */
+            <div className="w-full h-48 flex flex-col items-center justify-center bg-muted rounded-md border">
+              <FileText className="h-12 w-12 text-muted-foreground" />
+              <span className="mt-2 text-sm font-medium">
+                {value instanceof File ? value.name : "Documento Selecionado"}
+              </span>
+            </div>
+          )}
           <Button
             type="button"
             variant="destructive"

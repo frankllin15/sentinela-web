@@ -46,7 +46,7 @@ export function WarrantFields({ control }: WarrantFieldsProps) {
                 value={value || null}
                 onChange={onChange}
                 label="Upload do PDF do Mandado"
-                accept="application/pdf"
+                accept="application/pdf,image/*"
                 capture={false}
               />
             </FormControl>
