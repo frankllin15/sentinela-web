@@ -9,11 +9,8 @@ export const uploadService = {
     formData.append("category", category); // Envia o campo extra
 
     try {
-      const response = await api.post<{ url: string }>("/upload", formData, {
+      const response = await api.postForm<{ url: string }>("/upload", formData, {
         timeout: 60000, // 60 segundos,
-        headers: {
-          'Content-Type': 'multipart/form-data'        
-        }
         
       });
 
