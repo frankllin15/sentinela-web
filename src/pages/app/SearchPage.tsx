@@ -52,6 +52,8 @@ export function SearchPage() {
     Object.entries(filters).forEach(([key, value]) => {
       if (value && typeof value === "string" && value.trim() !== "") {
         newParams.set(key, value);
+      } else if (typeof value === "boolean") {
+        newParams.set(key, value.toString());
       }
     });
 

@@ -131,7 +131,7 @@ export function PageHeader({
         )}
 
         {/* Header content */}
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-4 flex-wrap">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 sm:gap-3">
               {/* Back button inline with title (when breadcrumbs exist) */}
@@ -150,7 +150,7 @@ export function PageHeader({
               {Icon && <Icon className="h-6 w-6 shrink-0" />}
 
               <div className="min-w-0 flex-1">
-                <h1 className="text-2xl sm:text-3xl font-bold truncate">
+                <h1 className="text-xl sm:text-3xl font-bold truncate">
                   {title}
                 </h1>
                 {subtitle && (

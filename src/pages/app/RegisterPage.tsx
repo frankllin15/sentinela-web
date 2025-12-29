@@ -17,7 +17,7 @@ import { mediaService } from "@/services/media.service";
 import { uploadService } from "@/services/upload.service";
 import { cleanCPF } from "@/lib/cpf.utils";
 import { MediaType } from "@/types/media.types";
-import { Loader2, Home } from "lucide-react";
+import { Loader2, Home, Plus } from "lucide-react";
 import { UploadCategory } from "@/types/upload-category";
 import { PageHeader } from "@/components/layout/PageHeader";
 
@@ -183,7 +183,10 @@ export function RegisterPage() {
                 Salvando...
               </>
             ) : (
-              "Salvar Cadastro"
+              <>
+                <Plus className="h-4 w-4" />
+              Salvar Cadastro
+              </>
             )}
           </Button>
         }

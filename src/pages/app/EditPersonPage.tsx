@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { Loader2, Home, Search } from "lucide-react";
+import { Loader2, Home, Search, Save } from "lucide-react";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -307,7 +307,10 @@ export function EditPersonPage() {
                 Salvando...
               </>
             ) : (
-              "Salvar Alterações"
+              <>
+              <Save className="h-4 w-4" />
+              Salvar
+              </>
             )}
           </Button>
         }
