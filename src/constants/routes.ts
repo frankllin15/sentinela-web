@@ -4,5 +4,6 @@ export const ROUTES = {
   REGISTER: '/app/register',
   SEARCH: '/app/search',
   PEOPLE_DETAIL: '/app/people/:id',
+  PROFILE: '/app/profile',
   ADMIN_USERS: '/admin/users',
 } as const;

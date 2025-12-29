@@ -93,7 +93,7 @@ export function AppLayout() {
                   "flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200",
                   isActive
                     ? "bg-slate-800 text-white border border-slate-700"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                    : "text-slate-400 hover:text-white bg-slate-800/30 hover:bg-slate-800/50"
                 )
               }
             >
@@ -208,6 +208,22 @@ export function AppLayout() {
               <Search className="w-5 h-5" />
               <span className="font-medium">Buscar</span>
             </NavLink>
+
+            <NavLink
+              to={ROUTES.PROFILE}
+              onClick={() => setMobileMenuOpen(false)}
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 px-4 py-4 text-base transition-colors duration-200",
+                  isActive
+                    ? "text-white bg-slate-800/50 border-l-4 border-blue-500"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800/30"
+                )
+              }
+            >
+              <User className="w-5 h-5" />
+              <span className="font-medium">Perfil</span>
+            </NavLink>
           </nav>
 
           {/* Logout Section */}
@@ -281,7 +297,10 @@ function ProfileDropdown() {
         align="end"
         className="w-56 bg-slate-800 border-slate-700 shadow-lg"
       >
-        <DropdownMenuItem className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700">
+        <DropdownMenuItem
+          onClick={() => navigate(ROUTES.PROFILE)}
+          className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700"
+        >
           <User className="w-4 h-4 mr-2" />
           <span>Perfil</span>
         </DropdownMenuItem>
