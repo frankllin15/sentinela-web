@@ -9,22 +9,12 @@ export const uploadService = {
     formData.append("category", category); // Envia o campo extra
 
     try {
-      const response = await api.postForm<{ url: string }>(
-        "/upload",
-        formData,
-        {
-          timeout: 60000, // 60 segundos,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          // Configuração necessária para algumas versões do Axios no mobile
-          transformRequest: (data) => {
-            // No mobile, às vezes o Axios tenta serializar o FormData como JSON
-            // se o header de Content-Type for deletado. Isso garante que ele siga como FormData.
-            return data;
-          },
-        }
-      );
+      // IMPORTANTE: Usar api.post (não postForm) e NÃO definir Content-Type manualmente
+      // O interceptor no axios.ts (linha 31-33) detecta FormData e remove o Content-Type
+      // permitindo que o browser adicione automaticamente com o boundary correto
+      const response = await api.post<{ url: string }>("/upload", formData, {
+        timeout: 60000, // 60 segundos para conexões lentas no mobile
+      });
 
       return response.data.url;
     } catch (error) {
@@ -35,9 +25,8 @@ export const uploadService = {
         const axiosError = error as {
           response?: { status: number; data: unknown };
         };
-        console.error("Status:", axiosError.response?.status);
-        console.error("Data:", axiosError.response?.data); // Não definir Content-Type manualmente - o axios detecta FormData
-        // e define automaticamente como multipart/form-data com boundary correto
+        console.error("Status HTTP:", axiosError.response?.status);
+        console.error("Resposta do servidor:", axiosError.response?.data);
       }
 
       throw error;
