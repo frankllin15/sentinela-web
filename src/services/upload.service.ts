@@ -4,9 +4,15 @@ import type { UploadCategory } from "@/types/upload-category";
 export const uploadService = {
   // Agora aceita a categoria como segundo parâmetro
   upload: async (file: File, category: UploadCategory): Promise<string> => {
+   // 1. FORÇAR DOWNLOAD/LEITURA:
+    // Isso obriga o browser mobile a resolver o arquivo do Drive/Cloud
+    const arrayBuffer = await file.arrayBuffer();
+    const forcedBlob = new Blob([arrayBuffer], { type: file.type });
+
     const formData = new FormData();
-    formData.append("file", file);
-    formData.append("category", category); // Envia o campo extra
+    // Passamos o nome original manualmente para garantir
+    formData.append("file", forcedBlob, file.name); 
+    formData.append("category", category);
 
     try {
       // IMPORTANTE: Usar api.post (não postForm) e NÃO definir Content-Type manualmente
