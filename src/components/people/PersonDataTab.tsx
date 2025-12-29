@@ -130,16 +130,18 @@ export function PersonDataTab({ person, onViewMap }: PersonDataTabProps) {
       )}
 
       {/* Status Legal */}
-      {person.warrantStatus && (
+      {(person.warrantStatus || person.warrantFileUrl) && (
         <Card className="border-destructive">
           <CardHeader>
             <CardTitle className="text-destructive">Status Legal</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div>
-              <span className="text-sm font-medium text-muted-foreground">Mandado de Prisão:</span>
-              <p className="mt-1">{person.warrantStatus}</p>
-            </div>
+            {person.warrantStatus && (
+              <div>
+                <span className="text-sm font-medium text-muted-foreground">Mandado de Prisão:</span>
+                <p className="mt-1">{person.warrantStatus}</p>
+              </div>
+            )}
 
             {person.warrantFileUrl && (
               <div>
