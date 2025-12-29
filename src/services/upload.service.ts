@@ -9,11 +9,7 @@ export const uploadService = {
     formData.append("category", category); // Envia o campo extra
 
     try {
-      const response = await api.post<{ url: string }>("/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await api.post<{ url: string }>("/upload", formData);
 
       return response.data.url;
     } catch (error) {
