@@ -4,7 +4,7 @@ import type {
   CreatePersonDto,
   UpdatePersonDto,
 } from "@/types/person.types";
-import type { PaginatedResponse, SearchFilters } from "@/types/common.types";
+import type { PaginatedResponse, SearchFilters, FaceSearchFilters, FaceSearchResponse } from "@/types/common.types";
 
 export const peopleService = {
   async getAll(params: SearchFilters): Promise<PaginatedResponse<Person>> {
@@ -29,6 +29,23 @@ export const peopleService = {
 
   async getById(id: number): Promise<Person> {
     const response = await api.get<Person>(`/people/${id}`);
+    return response.data;
+  },
+
+  async searchByFace(params: FaceSearchFilters): Promise<FaceSearchResponse> {
+    const formData = new FormData();
+    formData.append('image', params.image);
+    formData.append('limit', String(params.limit || 10));
+    formData.append('threshold', String(params.threshold || 0.5));
+
+    const response = await api.post<FaceSearchResponse>('/people/search-by-face', formData, {
+      timeout: 60000,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    // Backend retorna array direto
     return response.data;
   },
 };

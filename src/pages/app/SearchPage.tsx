@@ -1,22 +1,39 @@
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Filter, Search, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { usePeopleList } from "@/hooks/queries/usePeopleQueries";
+import { usePeopleList, useFaceSearch } from "@/hooks/queries/usePeopleQueries";
 import { PersonCard } from "@/components/search/PersonCard";
 import { FilterSheet } from "@/components/search/FilterSheet";
 import { Pagination } from "@/components/search/Pagination";
 import { LoadingState } from "@/components/search/LoadingState";
 import { EmptyState } from "@/components/search/EmptyState";
+import { SearchModeToggle } from "@/components/search/SearchModeToggle";
+import { FaceSearchInterface } from "@/components/search/FaceSearchInterface";
+import { FaceSearchResults } from "@/components/search/FaceSearchResults";
 import type { FilterFormValues } from "@/components/search/SearchFilters";
+import type { FaceSearchFilters } from "@/types/common.types";
 import { PageHeader } from "@/components/layout/PageHeader";
 
 const DEFAULT_LIMIT = 20;
 
 export function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const [searchMode, setSearchMode] = useState<'text' | 'face'>('text');
+  const [faceSearchParams, setFaceSearchParams] = useState<FaceSearchFilters | null>(null);
+
+  // Ler modo da URL ao montar
+  useEffect(() => {
+    const mode = searchParams.get('mode');
+    if (mode === 'face') {
+      setSearchMode('face');
+    } else {
+      setSearchMode('text');
+    }
+  }, [searchParams]);
 
   // Ler filtros e página da URL
   const page = Number(searchParams.get("page")) || 1;
@@ -35,6 +52,8 @@ export function SearchPage() {
     page,
     limit: DEFAULT_LIMIT,
   });
+
+  const { data: faceSearchData, isLoading: isFaceSearchLoading, error: faceSearchError } = useFaceSearch(faceSearchParams);
 
   const activeFilterCount = Object.entries(filterValues).filter(
     ([key, value]) => {
@@ -74,7 +93,29 @@ export function SearchPage() {
     const newParams = new URLSearchParams(searchParams);
     newParams.set("page", newPage.toString());
     setSearchParams(newParams);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleModeChange = (mode: 'text' | 'face') => {
+    setSearchMode(mode);
+    const newParams = new URLSearchParams(searchParams);
+    if (mode === 'face') {
+      newParams.set('mode', 'face');
+      // Limpar resultados de busca anterior ao trocar de modo
+      setFaceSearchParams(null);
+    } else {
+      newParams.delete('mode');
+    }
+    navigate({ search: newParams.toString() }, { replace: true });
+  };
+
+  const handleFaceSearchSubmit = (params: FaceSearchFilters) => {
+    setFaceSearchParams(params);
+    // window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleClearFaceSearch = () => {
+    setFaceSearchParams(null);
   };
 
   if (error) {
@@ -103,54 +144,75 @@ export function SearchPage() {
           { label: "Início", href: "/app/home", icon: Home },
           { label: "Buscar" },
         ]}
-        actions={
-          <Button
-            variant="outline"
-            onClick={() => setIsFilterSheetOpen(true)}
-            className="gap-2"
-          >
-            <Filter className="h-4 w-4" />
-            Filtros
-            {activeFilterCount > 0 && (
-              <Badge variant="secondary" className="ml-1">
-                {activeFilterCount}
-              </Badge>
-            )}
-          </Button>
-        }
       />
 
-      {isLoading ? (
-        <LoadingState />
-      ) : data && data.data.length > 0 ? (
+      <SearchModeToggle mode={searchMode} onModeChange={handleModeChange} />
+
+      {searchMode === 'text' ? (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {data.data.map((person) => (
-              <PersonCard key={person.id} person={person} />
-            ))}
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setIsFilterSheetOpen(true)}
+              className="gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Filtros
+              {activeFilterCount > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </Button>
           </div>
 
-          <Pagination
-            currentPage={page}
-            totalItems={data.total}
-            itemsPerPage={DEFAULT_LIMIT}
-            onPageChange={handlePageChange}
+          {isLoading ? (
+            <LoadingState />
+          ) : data && data.data.length > 0 ? (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {data.data.map((person) => (
+                  <PersonCard key={person.id} person={person} />
+                ))}
+              </div>
+
+              <Pagination
+                currentPage={page}
+                totalItems={data.total}
+                itemsPerPage={DEFAULT_LIMIT}
+                onPageChange={handlePageChange}
+              />
+            </>
+          ) : (
+            <EmptyState
+              onClearFilters={handleClearFilters}
+              hasActiveFilters={hasActiveFilters}
+            />
+          )}
+
+          <FilterSheet
+            open={isFilterSheetOpen}
+            onOpenChange={setIsFilterSheetOpen}
+            onApply={handleApplyFilters}
+            onClear={handleClearFilters}
+            initialValues={filterValues}
           />
         </>
       ) : (
-        <EmptyState
-          onClearFilters={handleClearFilters}
-          hasActiveFilters={hasActiveFilters}
-        />
-      )}
+        <>
+          <FaceSearchInterface onSearchSubmit={handleFaceSearchSubmit} />
 
-      <FilterSheet
-        open={isFilterSheetOpen}
-        onOpenChange={setIsFilterSheetOpen}
-        onApply={handleApplyFilters}
-        onClear={handleClearFilters}
-        initialValues={filterValues}
-      />
+          {faceSearchParams && (
+            <FaceSearchResults
+              results={faceSearchData || []}
+              isLoading={isFaceSearchLoading}
+              error={faceSearchError}
+              threshold={faceSearchParams.threshold || 0.5}
+              onClearSearch={handleClearFaceSearch}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

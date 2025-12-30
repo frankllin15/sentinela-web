@@ -4,6 +4,7 @@ export const UploadCategory = {
   FULL_BODY: "FULL_BODY",
   TATTOO: "TATTOO",
   WARRANT: "WARRANT",
+  SEARCH_FACE: "SEARCH_FACE", // Fotos usadas para busca facial
 } as const;
 
 export type UploadCategory =

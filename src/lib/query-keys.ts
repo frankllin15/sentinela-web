@@ -1,4 +1,4 @@
-import type { SearchFilters } from "@/types/common.types";
+import type { SearchFilters, FaceSearchFilters } from "@/types/common.types";
 
 export const queryKeys = {
   people: {
@@ -8,6 +8,8 @@ export const queryKeys = {
     details: () => [...queryKeys.people.all, 'detail'] as const,
     detail: (id: number) => [...queryKeys.people.details(), id] as const,
     byCpf: (cpf: string) => [...queryKeys.people.all, 'cpf', cpf] as const,
+    faceSearch: (filters: FaceSearchFilters | null) =>
+      [...queryKeys.people.all, 'face-search', filters] as const,
   },
   media: {
     all: ['media'] as const,

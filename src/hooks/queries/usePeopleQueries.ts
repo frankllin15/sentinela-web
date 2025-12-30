@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { peopleService } from '@/services/people.service';
 import { queryKeys } from '@/lib/query-keys';
-import type { SearchFilters } from '@/types/common.types';
+import type { SearchFilters, FaceSearchFilters } from '@/types/common.types';
 
 export function usePersonById(id: number | undefined, options?: { enabled?: boolean }) {
   return useQuery({
@@ -43,5 +43,18 @@ export function usePeopleList(filters: SearchFilters) {
   return useQuery({
     queryKey: queryKeys.people.list(processedFilters),
     queryFn: () => peopleService.getAll(processedFilters),
+  });
+}
+
+export function useFaceSearch(
+  filters: FaceSearchFilters | null,
+  options?: { enabled?: boolean }
+) {
+  return useQuery({
+    queryKey: queryKeys.people.faceSearch(filters),
+    queryFn: () => peopleService.searchByFace(filters!),
+    enabled: !!filters?.image && (options?.enabled ?? true),
+    gcTime: 0, // Não manter cache
+    staleTime: 0, // Sempre fazer nova requisição
   });
 }
