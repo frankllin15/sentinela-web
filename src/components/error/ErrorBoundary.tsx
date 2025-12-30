@@ -99,7 +99,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                   <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
                     Detalhes técnicos (dev mode)
                   </summary>
-                  <pre className="mt-2 rounded-md bg-slate-950 p-3 text-xs text-slate-50 overflow-x-auto">
+                  <pre className="mt-2 rounded-md bg-muted p-3 text-xs text-muted-foreground overflow-x-auto">
                     {this.state.error.stack}
                   </pre>
                 </details>

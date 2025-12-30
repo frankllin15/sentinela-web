@@ -51,12 +51,12 @@ export function LoginPage() {
   };
 
   return (
-    <Card className="w-full max-w-md border-slate-800 bg-slate-950">
+    <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle className="text-center text-2xl text-slate-50">
+        <CardTitle className="text-center text-2xl">
           SENTINELA
         </CardTitle>
-        <CardDescription className="text-center text-slate-400">
+        <CardDescription className="text-center">
           Sistema de Inteligência Policial
         </CardDescription>
       </CardHeader>
@@ -68,12 +68,11 @@ export function LoginPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-slate-200">Email</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
                       placeholder="seu.email@example.com"
-                      className="bg-slate-900 text-slate-50 border-slate-700"
                       {...field}
                     />
                   </FormControl>
@@ -87,13 +86,12 @@ export function LoginPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-slate-200">Senha</FormLabel>
+                  <FormLabel>Senha</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       inputMode="numeric"
                       placeholder="Digite sua senha numérica"
-                      className="bg-slate-900 text-slate-50 border-slate-700"
                       {...field}
                     />
                   </FormControl>

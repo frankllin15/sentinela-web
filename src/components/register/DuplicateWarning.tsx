@@ -7,7 +7,7 @@ interface DuplicateWarningProps {
 
 export function DuplicateWarning({ message }: DuplicateWarningProps) {
   return (
-    <Badge variant="outline" className="border-yellow-600 bg-yellow-950 text-yellow-200">
+    <Badge variant="outline" className="border-warning bg-warning/10 text-warning-foreground">
       <AlertTriangle className="mr-1 h-3 w-3" />
       {message}
     </Badge>

@@ -13,6 +13,8 @@ import {
 import { ROUTES } from "@/constants/routes";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ThemeToggleMobile } from "@/components/theme/ThemeToggleMobile";
 
 // UI Components
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -40,7 +42,7 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-slate-900 border-b border-slate-800 shadow-md">
+      <header className="sticky top-0 z-50 bg-slate-900 border-b border-border shadow-md">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-6">
           {/* Zone A - Brand (Left) */}
           <div className="flex items-center gap-3">
@@ -114,6 +116,11 @@ export function AppLayout() {
               />
             </div> */}
 
+            {/* Theme Toggle - Desktop */}
+            <div className="hidden lg:block">
+              <ThemeToggle />
+            </div>
+
             {/* Notifications Bell - UI placeholder */}
             <button
               className="relative p-2 text-slate-400 hover:text-white transition-colors duration-200"
@@ -148,26 +155,26 @@ export function AppLayout() {
 
       {/* Mobile Menu Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="top" className="bg-slate-900 border-slate-800">
+        <SheetContent side="top" className="bg-card border-border">
           {/* User Header */}
           {user && (
-            <div className="flex items-center gap-3 p-4 border-b border-slate-800">
+            <div className="flex items-center gap-3 p-4 border-b border-border">
               <Avatar className="w-12 h-12">
-                <AvatarFallback className="bg-blue-600 text-white font-semibold">
+                <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                   {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
 
               <div className="flex flex-col">
-                <span className="text-white font-medium text-base">
+                <span className="text-foreground font-medium text-base">
                   {user.name || user.email}
                 </span>
                 <span className="text-sm">
-                  <span className="text-blue-400">{formatRole(user.role)}</span>
+                  <span className="text-primary">{formatRole(user.role)}</span>
                   {user.forceName && (
                     <>
-                      <span className="text-slate-400 mx-1">•</span>
-                      <span className="text-slate-400">{user.forceName}</span>
+                      <span className="text-muted-foreground mx-1">•</span>
+                      <span className="text-muted-foreground">{user.forceName}</span>
                     </>
                   )}
                 </span>
@@ -184,8 +191,8 @@ export function AppLayout() {
                 cn(
                   "flex items-center gap-3 px-4 py-4 text-base transition-colors duration-200",
                   isActive
-                    ? "text-white bg-slate-800/50 border-l-4 border-blue-500"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800/30"
+                    ? "text-accent-foreground bg-accent border-l-4 border-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
                 )
               }
             >
@@ -200,8 +207,8 @@ export function AppLayout() {
                 cn(
                   "flex items-center gap-3 px-4 py-4 text-base transition-colors duration-200",
                   isActive
-                    ? "text-white bg-slate-800/50 border-l-4 border-blue-500"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800/30"
+                    ? "text-accent-foreground bg-accent border-l-4 border-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
                 )
               }
             >
@@ -216,8 +223,8 @@ export function AppLayout() {
                 cn(
                   "flex items-center gap-3 px-4 py-4 text-base transition-colors duration-200",
                   isActive
-                    ? "text-white bg-slate-800/50 border-l-4 border-blue-500"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800/30"
+                    ? "text-accent-foreground bg-accent border-l-4 border-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
                 )
               }
             >
@@ -226,14 +233,17 @@ export function AppLayout() {
             </NavLink>
           </nav>
 
+          {/* Theme Toggle Section */}
+          <ThemeToggleMobile />
+
           {/* Logout Section */}
-          <div className="border-t border-slate-800 pt-4 mt-auto">
+          <div className="border-t border-border pt-4 mt-auto">
             <button
               onClick={() => {
                 handleLogout();
                 setMobileMenuOpen(false);
               }}
-              className="flex items-center gap-3 px-4 py-4 w-full text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 rounded-md"
+              className="flex items-center gap-3 px-4 py-4 w-full text-destructive hover:text-destructive/90 hover:bg-destructive/10 transition-all duration-200 rounded-md"
             >
               <LogOut className="w-5 h-5" />
               <span className="font-medium">Sair</span>
@@ -295,22 +305,20 @@ function ProfileDropdown() {
 
       <DropdownMenuContent
         align="end"
-        className="w-56 bg-slate-800 border-slate-700 shadow-lg"
+        className="w-56"
       >
         <DropdownMenuItem
           onClick={() => navigate(ROUTES.PROFILE)}
-          className="text-slate-200 hover:bg-slate-700 focus:bg-slate-700"
         >
           <User className="w-4 h-4 mr-2" />
           <span>Perfil</span>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator className="bg-slate-700" />
+        <DropdownMenuSeparator />
 
         <DropdownMenuItem
           variant="destructive"
           onClick={handleLogout}
-          className="text-red-400 hover:text-red-300 focus:text-red-300"
         >
           <LogOut className="w-4 h-4 mr-2" />
           <span>Sair</span>

@@ -24,12 +24,12 @@ export function NotFoundPage() {
           </p>
           {isAuthenticated ? (
             <Button onClick={() => navigate(ROUTES.HOME)} className="w-full">
-              <Home className="mr-2 h-4 w-4" />
+              <Home className="h-4 w-4" />
               Voltar para Home
             </Button>
           ) : (
             <Button onClick={() => navigate(ROUTES.LOGIN)} className="w-full">
-              <LogIn className="mr-2 h-4 w-4" />
+              <LogIn className="h-4 w-4" />
               Fazer Login
             </Button>
           )}

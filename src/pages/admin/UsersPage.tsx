@@ -233,7 +233,7 @@ export function UsersPage() {
                           <DropdownMenuItem
                             onClick={() => setEditingUserId(user.id)}
                           >
-                            <Pencil className="mr-2 h-4 w-4" />
+                            <Pencil className="h-4 w-4" />
                             <span>Editar</span>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -247,12 +247,12 @@ export function UsersPage() {
                           >
                             {user.isActive ? (
                               <>
-                                <Ban className="mr-2 h-4 w-4 text-orange-500" />
+                                <Ban className="h-4 w-4 text-warning" />
                                 <span>Desativar</span>
                               </>
                             ) : (
                               <>
-                                <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                                <CheckCircle className="h-4 w-4 text-success" />
                                 <span>Ativar</span>
                               </>
                             )}
@@ -330,7 +330,7 @@ export function UsersPage() {
                   Deseja {confirmAction.currentStatus ? 'desativar' : 'ativar'} o usuário{' '}
                   <span className="font-semibold">{confirmAction.userName}</span>?
                   {confirmAction.currentStatus && (
-                    <span className="block mt-2 text-orange-600">
+                    <span className="block mt-2 text-warning">
                       Um usuário desativado não poderá fazer login no sistema.
                     </span>
                   )}

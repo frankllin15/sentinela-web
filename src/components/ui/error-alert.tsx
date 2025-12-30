@@ -75,7 +75,7 @@ export function ErrorAlert({
               </button>
 
               {detailsExpanded && (
-                <pre className="mt-2 rounded-md bg-slate-950 p-3 text-xs text-slate-50 overflow-x-auto">
+                <pre className="mt-2 rounded-md bg-muted p-3 text-xs text-muted-foreground overflow-x-auto">
                   {JSON.stringify(details, null, 2)}
                 </pre>
               )}
