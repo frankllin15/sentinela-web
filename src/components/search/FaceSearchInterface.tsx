@@ -16,7 +16,9 @@ const THRESHOLD_PRESETS = [
   { value: 0.9, label: "Exata" },
 ] as const;
 
-export function FaceSearchInterface({ onSearchSubmit }: FaceSearchInterfaceProps) {
+export function FaceSearchInterface({
+  onSearchSubmit,
+}: FaceSearchInterfaceProps) {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [threshold, setThreshold] = useState(0.7);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -57,14 +59,15 @@ export function FaceSearchInterface({ onSearchSubmit }: FaceSearchInterfaceProps
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Buscar por Reconhecimento Facial</CardTitle>
+        <CardTitle className="text-lg">
+          Buscar por Reconhecimento Facial
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <input
           ref={inputRef}
           type="file"
           accept="image/*"
-          capture="environment"
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
@@ -77,7 +80,7 @@ export function FaceSearchInterface({ onSearchSubmit }: FaceSearchInterfaceProps
             <img
               src={preview}
               alt="Foto para busca"
-              className="w-full h-64 object-cover rounded-md border"
+              className="w-full h-64 object-contain rounded-md border"
             />
             <Button
               type="button"
@@ -111,7 +114,8 @@ export function FaceSearchInterface({ onSearchSubmit }: FaceSearchInterfaceProps
                 variant="outline"
                 className={cn(
                   "h-12",
-                  threshold === preset.value && "bg-primary ring-1 ring-inset ring-primary hover:bg-primary/90 hover:text-primary-foreground"
+                  threshold === preset.value &&
+                    "bg-primary ring-1 ring-inset ring-primary hover:bg-primary/90 hover:text-primary-foreground"
                 )}
                 onClick={() => setThreshold(preset.value)}
               >
@@ -120,7 +124,8 @@ export function FaceSearchInterface({ onSearchSubmit }: FaceSearchInterfaceProps
             ))}
           </div>
           <p className="text-xs text-muted-foreground">
-            Ampla: mais resultados, menos precisão | Exata: menos resultados, mais precisão
+            Ampla: mais resultados, menos precisão | Exata: menos resultados,
+            mais precisão
           </p>
         </div>
 
