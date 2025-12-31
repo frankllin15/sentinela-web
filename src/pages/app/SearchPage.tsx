@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Filter, Search, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,18 +22,11 @@ export function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  const [searchMode, setSearchMode] = useState<'text' | 'face'>('text');
+  const [searchMode, setSearchMode] = useState<'text' | 'face'>(() => {
+    const mode = new URLSearchParams(window.location.search).get('mode');
+    return mode === 'face' ? 'face' : 'text';
+  });
   const [faceSearchParams, setFaceSearchParams] = useState<FaceSearchFilters | null>(null);
-
-  // Ler modo da URL ao montar
-  useEffect(() => {
-    const mode = searchParams.get('mode');
-    if (mode === 'face') {
-      setSearchMode('face');
-    } else {
-      setSearchMode('text');
-    }
-  }, [searchParams]);
 
   // Ler filtros e página da URL
   const page = Number(searchParams.get("page")) || 1;

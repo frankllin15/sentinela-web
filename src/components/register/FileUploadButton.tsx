@@ -17,7 +17,7 @@ export function FileUploadButton({
   onChange,
   label,
   accept = "image/*",
-  capture = true,
+  capture = false,
   existingImageUrl,
   onRemoveExisting,
 }: FileUploadButtonProps) {
